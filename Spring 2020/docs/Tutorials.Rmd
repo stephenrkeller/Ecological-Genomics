@@ -1,0 +1,24 @@
+---
+title: "Tutorials and Scripts"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+fontsize: 18pt
+---
+
+[Back to main page](index.html)
+
+**List of Tutorials** 
+
+1. 2020-01-XX: [Command-line UNIX tutorial]()
+
+2. 
+
+
+
+### Troubleshooting   
+
+If you're on a Mac and havin trouble with R loading packages that depend on X11, you may not have it installed on your system (recent Mac's don't have this loaded at the factory). [Follow this link](https://stackoverflow.com/questions/38952427/include-cairo-r-on-a-mac) for a thread on how to install X11.
+
+
+ 
