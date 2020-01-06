@@ -10,5 +10,6 @@ fontsize: 20pt
 
 1. [Getting Started](Getting_started.html)     
 2. [Class member page](Class_members.html)
-3. [Tutorials and scripts](Tutorials.html)     
+3. [Tutorials and scripts](Tutorials.html)   
+4. [Test file](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/test.txt)
 
