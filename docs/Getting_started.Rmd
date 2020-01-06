@@ -7,7 +7,7 @@ output:
 fontsize: 18pt
 ---
 
-[Back to main page](https://stephenrkeller.github.io/2018_Ecological_Genomics/)
+[Back to main page](https://stephenrkeller.github.io/Ecological-Genomics/)
 
 ### Things you'll need to download:
 1. [R](https://www.r-project.org/) and [Rstudio](https://www.rstudio.com/) (be sure to install and load the "knitr"" package)
