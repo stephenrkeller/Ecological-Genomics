@@ -14,7 +14,7 @@ fontsize: 18pt
 2. Create a [github](https://github.com/) account and download github [desktop](https://desktop.github.com/)
 
 
-### Logs research activities in your online notebook [template found here](https://github.com/stephenrkeller/2018_Ecological_Genomics/blob/master/Template_online_notebook.Rmd).   
+### Logs research activities in your online notebook [template found here](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Template_online_notebook.Rmd).   
 
 ### Common code you'll need to word process in (R)markdown  
 
@@ -56,4 +56,4 @@ knitr::kable(dat)
   * [Detailed Rmd cheatsheet for RStudio](http://www.rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf)
 
 
-[Back to main page](https://stephenrkeller.github.io/2018_Ecological_Genomics/)
+[Back to main page](https://stephenrkeller.github.io/Ecological-Genomics/)
