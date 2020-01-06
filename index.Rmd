@@ -10,6 +10,6 @@ fontsize: 20pt
 
 1. [Getting Started](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/Getting_started.html)     
 2. [Class member page](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/Class_members.html)
-3. [Tutorials and scripts](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/Tutorials.html)   
+3. [Tutorials and scripts](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/tutorials/Tutorials.html)   
 4. [Test file](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring 2020/test.txt)
 
