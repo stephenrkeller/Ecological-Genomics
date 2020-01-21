@@ -87,7 +87,13 @@ drwxr-xr-x. 3 srkeller users 4096 Jan 21 12:51 myscripts
 
 - Now we all have the same tidy organizational structure that we can use throughput the semester for our scripts, data, and results.  Speaking of data, let's go get some!
 
-- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from red spruce trees.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/mydata/Figure2_Capblancq_etal_EvolApps.jpg)  
+- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from [red spruce (*Picea rubens* Sarg.)](https://en.wikipedia.org/wiki/Picea_rubens) trees.  Red spruce is a long-lived coniferous tree that grows in cool moist habitats like high elevations in the mountains or along the coast of Atlantic Canada.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. 
+
+![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/mydata/Figure2_Capblancq_etal_EvolApps.png?raw=true) 
+![](http://www.uvm.edu/~kellrlab/uploads/2/2/9/6/22961126/editor/img-20170930-155547560.jpg?1533919793)
+
+- If it looks like this was a lot of hard work, well, you've got it right!
+
 
 - We've placed the raw sequence files and a text file containing some collection metadata under a shared directory on the server. The path to this shared space is: `/data/project_data/RS_ExomeSeq`   
 
