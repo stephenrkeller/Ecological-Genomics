@@ -1,0 +1,12 @@
+PASS	Basic Statistics	AB_18_R2_fastq.gz
+PASS	Per base sequence quality	AB_18_R2_fastq.gz
+WARN	Per tile sequence quality	AB_18_R2_fastq.gz
+PASS	Per sequence quality scores	AB_18_R2_fastq.gz
+WARN	Per base sequence content	AB_18_R2_fastq.gz
+PASS	Per sequence GC content	AB_18_R2_fastq.gz
+PASS	Per base N content	AB_18_R2_fastq.gz
+PASS	Sequence Length Distribution	AB_18_R2_fastq.gz
+PASS	Sequence Duplication Levels	AB_18_R2_fastq.gz
+PASS	Overrepresented sequences	AB_18_R2_fastq.gz
+PASS	Adapter Content	AB_18_R2_fastq.gz
+WARN	Kmer Content	AB_18_R2_fastq.gz
