@@ -87,7 +87,7 @@ drwxr-xr-x. 3 srkeller users 4096 Jan 21 12:51 myscripts
 
 - Now we all have the same tidy organizational structure that we can use throughput the semester for our scripts, data, and results.  Speaking of data, let's go get some!
 
-- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from red spruce trees.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/mydata/metadata/Figure2_Capblancq_etal_EvolApps.pdf)  
+- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from red spruce trees.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/mydata/Figure2_Capblancq_etal_EvolApps.png)  
 
 - We've placed the raw sequence files and a text file containing some collection metadata under a shared directory on the server. The path to this shared space is: `/data/project_data/RS_ExomeSeq`   
 
