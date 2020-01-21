@@ -92,7 +92,10 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 ### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
 
 * Lauren Ashlock gave brief intro on using github to create a repo and document your work
+
 * I led a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [https://pespenilab.github.io/Ecological-Genomics/Tutorials.html](2020 tutorial page)
+
+* I added a test [https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring%202020/myresults/per_base_quality.png](picture from a FASTQC run) to deonsterate how to embed links to pictures from your online lab notebook
 
 
 ------
