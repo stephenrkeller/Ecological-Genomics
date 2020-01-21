@@ -87,9 +87,11 @@ drwxr-xr-x. 3 srkeller users 4096 Jan 21 12:51 myscripts
 
 - Now we all have the same tidy organizational structure that we can use throughput the semester for our scripts, data, and results.  Speaking of data, let's go get some!
 
-- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from red spruce trees.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. We've placed a text file containing some metadata information on the samples that were sequenced under a shared space on the server. The path to this shared space is: 
+- For the first part of the semester, we're going to analyze some unpublished exome-capture Illumina data sequenced from red spruce trees.  For this project, my lab collected needle tissue and cones from trees across the Appalachian mountains, from Tennessee, USA to New Brunswick, Canada. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/mydata/metadata/Figure2_Capblancq_etal_EvolApps.pdf)  
 
-    - `/data/project_data/RS_ExomeSeq`   Try using `cd` to navigate over to this location. Then `ll` to show its contents. You should see something like this:
+- We've placed the raw sequence files and a text file containing some collection metadata under a shared directory on the server. The path to this shared space is: `/data/project_data/RS_ExomeSeq`   
+
+- Try using `cd` to navigate over to this location. Then `ll` to show its contents. You should see something like this:
     
 ```
 [srkeller@pbio381 ~]$ cd /data/project_data/RS_ExomeSeq
@@ -99,51 +101,34 @@ drwxr-xr-x. 2 srkeller users 42 Jan 21 14:06 metadata
 [srkeller@pbio381 mydata]$ 
 ```
 
-- First let's look at what's in the `metadata` folder:
+- The `fastq` dir contains the paired-end Illumina sequence files, while the `metadata` dir contains the collection info.  Navigate inside the `metadata` folder and you should see a file called `RS_Exome_metadata.txt`.  Let's use the `head` command to peek at the first 10 lines:
 
 ```
-[srkeller@pbio381 metadata]$ ll
-total 20
--rwxr-xr-x. 1 srkeller users 18971 Jan 21 14:05 RS_Exome_metadata.txt
+[srkeller@pbio381 metadata]$ head RS_Exome_metadata.txt
+Pop	Tree	Family	State	Region	Date	Latitude	Longitude	Elevation	DBH
+AB	05	AB_05	TN	E	09002016	35.55297	83.49438	1812	57.7
+AB	08	AB_08	TN	E	09002016	35.55212	83.49259	1785	44.3
+AB	12	AB_12	TN	E	09002016	35.5389	83.49463	1750	36.8
+AB	16	AB_16	TN	E	09002016	35.53882	83.49534	1738	44.0
+AB	18	AB_18	TN	E	09002016	35.53945	83.49375	1769	68.2
+ALB	01	ALB_01	ME	C	11112017	44.30670	70.84019	455	28.1
+ALB	02	ALB_02	ME	C	11112017	44.30564	70.84081	524	11.3
+ALB	03	ALB_03	ME	C	11112017	44.30359	70.84096	523	19.9
+ALB	05	ALB_05	ME	C	11112017	44.30182	70.83729	573	11.9
 ``` 
 
-  
+- The headers should be self-explanatory.  Note the column 'Region' -- this refers to the geographical and genetic cluster that each individual belongs to (see map above):  the "Core" (C), "Margin" (M), or "Edge" (E).  The entire dataset is part of a larger NSF-funded project on the population genomics of climate adaptation in red spruce.  For our class work, we're going to be focusing on just the Edge samples.  Bash gives us a convenient way to search within our file and pull out just the rows of data that match a term of interest (in this case, we'll search for "E").  We do this using a "generalized regular expression, also known as the `grep` command: 
 
-```bash
-[srkeller@pbio381 data]$ ll
-total 12
-drwxr-xr-x.  5 root     root       73 Jan 31  2017 archive
-drwxr-xr-x.  2 srkeller users      49 Jan 23 13:20 external_data
-drwxrwxr-x.  2 root     pb381adm   40 Nov 30  2015 packages
-drwxrwxr-x. 48 root     pb381adm 4096 Mar 28  2017 popgen
-drwxrwxr-x.  4 root     pb381adm   42 Jan 23 16:51 project_data
-drwxrwxr-x.  2 root     pb381adm 4096 Aug  8 16:53 scripts
-drwxr-xr-x. 21 root     root     4096 Feb  1  2017 users
-[srkeller@pbio381 data]$ 
+- We don't want to open and make changes to this file in the shared space, because we don't want to have our edits affect the rest of the group. (Also, notice that you don't have "write" (w) permissions, so you can't anyway!)  Best practices are to first make a copy of this file over to our home directory and put it inside your "mydata" folder. Use the `cp` command, followed by the filename, and the path to your destination (remember the ~ signals your home directory, and each subdirectory is then separated by a /):
+
+```
+[srkeller@pbio381 metadata]$ cp RS_Exome_metadata.txt ~/<YourGithubRepoName>/mydata/
 ```
 
-- Now, `cd` into the folder called "project_data" and `ll`. Do you see this?
+- Now `cd` back to `~/<YourGithubRepoName>/mydata/` and look inside. You should see your file...
 
 ```bash
-[srkeller@pbio381 data]$ cd project_data/
-[srkeller@pbio381 project_data]$ ll
-drwxrwxr-x. 4 root pb381adm   35 Jan 23 16:52 beetles
-drwxr-xr-x. 8 root pb381adm 4096 Jan 23 13:20 ssw
-[srkeller@pbio381 project_data]$ 
-```
-
-- The folder 'beetles' will hold the data we'll be working with this semester. Go ahead and cd to `beetles` and then again into `metadata`. Doing an `ll` should then show you a file called "cols_data.txt" which contains all the sample information for the beetles that have been sequenced. 
-
-- We don't want to open and make changes to this file in the shared space, because we don't want to have our edits affect the rest of the group. So, let's first make a copy of this file over to our home directory and put it inside the "mydata" folder. Use the `cp` command, followed by the filename, and the path to your destination (remember the ~ signals your home directory, and each subdirectory is then separated by a /):
-
-```bash
-[srkeller@pbio381 project_data]$ cp cols_data.txt ~/mydata/
-```
-
-- `cd` back to your `~/mydata/` directory and look inside. You should see your file...
-
-```bash
-[srkeller@pbio381 project_data]$ cd ~/mydata/
+[srkeller@pbio381 project_data]$ cd ~/Ecological_Genomics/mydata/
 [srkeller@pbio381 mydata]$ ll
 total 4
 -rwxr-xr-x. 1 srkeller users 1474 Jan 23 17:13 cols_data.txt
