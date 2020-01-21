@@ -1,4 +1,4 @@
 # Ecological Genomics
  Course materials for P/BIO381 graduate course taught at UVM
 
-The webpage for tutorials and student lab notebookds can be found [here:](https://stephenrkeller.github.io/Ecological-Genomics/)
+The Spring 2020 webpage for tutorials and student lab notebooks can be found [here:](https://pespenilab.github.io/Ecological-Genomics/)
