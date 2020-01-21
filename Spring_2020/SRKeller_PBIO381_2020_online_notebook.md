@@ -91,10 +91,11 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 <div id='id-section1'/>
 ### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
 
-* Lauren Ashlock gave brief intro on using github to create a repo and document your work
+* Ask Lauren to give a brief intro on using git to create a repo and document your work in a lab notebook; push to origin on github
 
-* I led a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [2020 tutorial page](https://pespenilab.github.io/Ecological-Genomics/Tutorials.html)
+* I'll lead a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [2020 tutorial page](https://pespenilab.github.io/Ecological-Genomics/Tutorials.html)
 
+#### Let's get started!
 
 *  Embed a bit of unix code showing how to log-in to the server:
 
@@ -122,6 +123,10 @@ AB_05_R1_fastq.gz   CRA_02_R2_fastq.gz  GPA_03_R1_fastq.gz  MRC_16_R2_fastq.gz  
 How to list out just some of the pops (say, just the AB's), or create a list of the number of unique pops?
 
 ```
+[srkeller@pbio381 edge_fastq]$ ls AB*
+AB_05_R1_fastq.gz  AB_08_R1_fastq.gz  AB_12_R1_fastq.gz  AB_16_R1_fastq.gz  AB_18_R1_fastq.gz
+AB_05_R2_fastq.gz  AB_08_R2_fastq.gz  AB_12_R2_fastq.gz  AB_16_R2_fastq.gz  AB_18_R2_fastq.gz
+
 [srkeller@pbio381 edge_fastq]$ ls | sed 's/\_/\t/g' | cut -f1 | uniq >~/myresults/metadata/Edge.pops 
 [srkeller@pbio381 edge_fastq]$ cat ~/myresults/metadata/Edge.pops 
 AB
@@ -150,7 +155,12 @@ XSK
 XWS
 ```
 
-* I added a test picture from a FASTQC run to demonsterate how to embed links to pictures from your online lab notebook. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/myresults/fastqc/AB_05_R1_fastq_fastqc/Images/per_base_quality.png) 
+#### We can use `scp` or a GUI sftp app to transfer the files to our local drive and then upload to github. 
+
+```
+```
+
+* Here's a picture from one of the FASTQC run to demonstrate how to embed links to pictures from your online lab notebook. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/myresults/fastqc/AB_05_R1_fastq_fastqc/Images/per_base_quality.png) 
 
 
 
