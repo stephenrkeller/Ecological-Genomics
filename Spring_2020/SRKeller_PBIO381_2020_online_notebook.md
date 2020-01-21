@@ -95,7 +95,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 * I led a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [2020 tutorial page](https://pespenilab.github.io/Ecological-Genomics/Tutorials.html)
 
-* I added a test picture from a FASTQC run to demonsterate how to embed links to pictures from your online lab notebook. ![](https://github.com/stephenrkeller/Ecological-Genomics/blob/master/Spring%202020/myresults/per_base_quality.png) 
+* I added a test picture from a FASTQC run to demonsterate how to embed links to pictures from your online lab notebook. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/myresults/fastqc/AB_05_R1_fastq_fastqc/Images/per_base_quality.png) 
 
 *  Embed a bit of unix code showing how to log-in to the server:
 
