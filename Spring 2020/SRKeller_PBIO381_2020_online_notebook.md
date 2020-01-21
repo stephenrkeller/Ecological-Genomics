@@ -1,12 +1,12 @@
-## Author: (your name)     
+## Author: Stephen R. Keller  
 ## Ecological Genomics:   
 
 ### Overall Description of notebook      
 
-fill in your description here!
+My notes on coding and data analysis for the Spring 2020 Ecological Genomics course @ UVM
 
 
-### Date started: (year-month-day)   
+### Date started: 2020-Jan-22
 ### Date end:   (year-month-day)    
 
 ### Philosophy   
@@ -26,8 +26,8 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 
 ### Table of contents for 60 entries (Format is *Page: Date(with year-month-day). Title*)        
-* [Page 1: 2018-01-24](#id-section1). Intro to Github, RMarkdown, and UNIX command-line
-* [Page 2: 2018-01-29](#id-section2).
+* [Page 1: 2020-01-22](#id-section1). Intro to Github, Markdown, and UNIX command-line
+* [Page 2:](#id-section2).
 * [Page 3:](#id-section3).
 * [Page 4:](#id-section4).
 * [Page 5:](#id-section5).
@@ -89,7 +89,10 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 ------
 <div id='id-section1'/>
-### Page 1: 2018-01-24. Notes on using Github, Rmarkdown, and the UNIX command-line
+### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
+
+* Lauren Ashlock gave brief intro on using github to create a repo and document your work
+* I led a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [https://pespenilab.github.io/Ecological-Genomics/Tutorials.html](2020 tutorial page)
 
 
 ------
