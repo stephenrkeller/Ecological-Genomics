@@ -1,0 +1,12 @@
+PASS	Basic Statistics	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Per base sequence quality	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Per tile sequence quality	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Per sequence quality scores	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+WARN	Per base sequence content	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Per sequence GC content	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Per base N content	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Sequence Length Distribution	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Sequence Duplication Levels	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Overrepresented sequences	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Adapter Content	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
+PASS	Kmer Content	RAPiD-Genomics_F070_UVM_131901_P001_WA01_i5-504_i7-59_S389_L002_R1_001.fastq.gz
