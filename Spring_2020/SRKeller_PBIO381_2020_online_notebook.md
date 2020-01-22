@@ -95,72 +95,26 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 * I'll lead a tutorial on logging into the class unix server, doing some basic unix navigation and file manipulation, and writing simple for loops to run Fastqc.  Notes for all the 2020 tutorials are posted here: [2020 tutorial page](https://pespenilab.github.io/Ecological-Genomics/Tutorials.html)
 
-#### Let's get started!
 
-*  Embed a bit of unix code showing how to log-in to the server:
 
-```
-ip0af52994:~ stephenkeller$ ssh srkeller@pbio381.uvm.edu
-srkeller@pbio381.uvm.edu's password: 
-Last login: Thu Jan 16 10:58:54 2020 from ip0af52994.int.uvm.edu
-[srkeller@pbio381 ~]$ pwd
-/users/s/r/srkeller
-[srkeller@pbio381 ~]$ hostname
-pbio381.uvm.edu
-[srkeller@pbio381 ~]$ 
-```
+* Went through  a bit of unix code showing how to log-in to the server
 
-* Show where the project data  fastq files live:
+* Showed where the shared project data files live
 
-```
-[srkeller@pbio381 myresults]$ cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq/
-[srkeller@pbio381 edge_fastq]$ ls
-AB_05_R1_fastq.gz   CRA_02_R2_fastq.gz  GPA_03_R1_fastq.gz  MRC_16_R2_fastq.gz  RP_11_R1_fastq.gz   XDS_06_R2_fastq.gz
+* Went through unix commands:  `pwd, cd, ls, grep, cp, wc, pipe (|), redirect to file (>)`
 
-[...]
-```
+* Showed how to use git to add, commit, and push to server
 
-How to list out just some of the pops (say, just the AB's), or create a list of the number of unique pops?
+* Posted to Slack afterwards about using `git pull` prior to merge any changes from github first prior to pushing commits to the cloud
 
-```
-[srkeller@pbio381 edge_fastq]$ ls AB*
-AB_05_R1_fastq.gz  AB_08_R1_fastq.gz  AB_12_R1_fastq.gz  AB_16_R1_fastq.gz  AB_18_R1_fastq.gz
-AB_05_R2_fastq.gz  AB_08_R2_fastq.gz  AB_12_R2_fastq.gz  AB_16_R2_fastq.gz  AB_18_R2_fastq.gz
+* On next Wednesday, pick up with using vim to edit files (using .bashrc as example) and then working with fastq files
 
-[srkeller@pbio381 edge_fastq]$ ls | sed 's/\_/\t/g' | cut -f1 | uniq >~/myresults/metadata/Edge.pops 
-[srkeller@pbio381 edge_fastq]$ cat ~/myresults/metadata/Edge.pops 
-AB
-BFA
-BRB
-CR
-CRA
-CRR
-DG
-GFM
-GPA
-HR
-KOS
-MRC
-MT
-PRK
-RP
-WA
-XCS
-XCV
-XDS
-XFS
-XGL
-XPK
-XSK
-XWS
-```
+* Plan should be to walk-through fastqs, assign population samples to students, have them run fastqc, 
+	have them design a trimomatic script to clean the reads up, then set up a bash script in `screen` to map reads with bwa and 
+        calculate genotype likelihoods 
 
-#### We can use `scp` or a GUI sftp app to transfer the files to our local drive and then upload to github. 
 
-```
-```
 
-* Here's a picture from one of the FASTQC run to demonstrate how to embed links to pictures from your online lab notebook. ![](https://github.com/stephenrkeller/Ecological_Genomics/blob/master/Spring_2020/myresults/fastqc/AB_05_R1_fastq_fastqc/Images/per_base_quality.png) 
 
 
 
