@@ -3,10 +3,10 @@
 # Pipeline to assess sequencing quality of RS exome sequences
 
 # Set your repo address here -- double check carefully!
-myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020/myresults"
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 
 # Make a new folder within 'myresults' to hold your fastqc outputs
-mkdir fastqc
+mkdir ${myrepo}/myresults/fastqc
 
 # Each student gets assigned a population to work with:
 mypop="AB" 
@@ -19,8 +19,8 @@ for file in ${input}*fastq.gz
 
 do
 
- fastqc ${file} -o ${myrepo}/fastqc
- echo -e "\n\n   Results saved to ${myrepo}/fastqc...on to the next one!   \n\n"
+ fastqc ${file} -o ${myrepo}/myresults/fastqc
+ echo -e "\n\n   Results saved to ${myrepo}/myresults/fastqc...on to the next one!   \n\n"
 
 done
 
