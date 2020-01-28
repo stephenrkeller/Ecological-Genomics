@@ -109,18 +109,17 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 * On next Wednesday, pick up with using vim to edit files (using .bashrc as example) and then working with fastq files
 
-* Plan should be to walk-through fastqs, assign population samples to students, have them run fastqc, 
-	have them design a trimomatic script to clean the reads up, then set up a bash script in `screen` to map reads with bwa and 
-        calculate genotype likelihoods 
-
-
-
-
+* Plan should be to walk-through fastqs, assign population samples to students, have them run fastqc, have them design a trimomatic script to clean the reads up, then set up a bash script in `screen` to map reads with bwa and calculate genotype likelihoods 
 
 
 ------
 <div id='id-section2'/>
 ### Page 2: 2018-01-29 
+
+Example output from FastQC (copied to my 'docs' folder on GitHub for webpage display)
+
+![]()
+
 ------
 <div id='id-section3'/>
 ### Page 3:
