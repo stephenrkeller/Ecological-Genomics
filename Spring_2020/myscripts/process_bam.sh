@@ -4,7 +4,7 @@
 for file in ${output}/BWA/${mypop}*.sorted.bam
 do
 	f=${file/.sorted.bam/}
-	sambamba-0.7.1-linux-static markdup -r -t 1 ${file} ${f}.rmdup.bam
+	sambamba-0.7.1-linux-static markdup -r -t 10 ${file} ${f}.rmdup.bam
 	samtools sort ${f}.rmdup.bam -o ${f}.sorted.rmdup.bam
 done
 
@@ -31,15 +31,15 @@ do
 	samtools depth ${file} | awk '{sum+=$3} END {print sum/NR}'
 done >> ${myrepo}/myresults/${mypop}.coverage.txt
 
-R --vanilla <<EOF
-
-	reads_Q = read.table("${myrepo}/myresults/${mypop}.Qscores.txt",header = FALSE)
-	mean_cov = read.table("${myrepo}/myresults/${mypop}.coverage.txt",header = FALSE)
-	ind_names = read.table("${myrepo}/myresults/${mypop}.names.txt", header = FALSE)
-	qual_res = cbind (ind_names, reads_Q, mean_cov)
-	colnames(qual_res) = c("Individuals", "Total_reads", "Total_mapped", "Total_mapq10", "Total_mapq20", "Total_mapq30", "Mean_cov")
-	write.table(qual_res, "${myrepo}/myresults/${mypop}_MappingResults.txt")
-EOF
+#R --vanilla <<EOF
+#
+#	reads_Q = read.table("${myrepo}/myresults/${mypop}.Qscores.txt",header = FALSE)
+#	mean_cov = read.table("${myrepo}/myresults/${mypop}.coverage.txt",header = FALSE)
+#	ind_names = read.table("${myrepo}/myresults/${mypop}.names.txt", header = FALSE)
+#	qual_res = cbind (ind_names, reads_Q, mean_cov)
+#	colnames(qual_res) = c("Individuals", "Total_reads", "Total_mapped", "Total_mapq10", "Total_mapq20", "Total_mapq30", "Mean_cov")
+#	write.table(qual_res, "${myrepo}/myresults/${mypop}_MappingResults.txt")
+#EOF
 
 for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
 do
