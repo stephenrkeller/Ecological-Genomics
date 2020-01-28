@@ -20,12 +20,12 @@ output="/data/project_data/RS_ExomeSeq/mapping"
 
 cd ${myrepo}/myscripts
 
-#source ./trimmedReadCounts.sh
+source ./trimmedReadCounts.sh
 
 
 #  Map reads to ref genome using BWA
 
-#source ./mapping.sh
+source ./mapping.sh
 
 
 # Take sequence alignment  (sam) files and convert to bam>sort>remove PCR dups>sort again>index
