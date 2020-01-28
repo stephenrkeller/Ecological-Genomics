@@ -116,7 +116,10 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 <div id='id-section2'/>
 ### Page 2: 2018-01-29 
 
-[Example output from FastQC -- copied to my 'docs' folder on GitHub for webpage display](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R1_fastq_fastqc.html)
+Example output from FastQC -- copied to my 'docs' folder on GitHub for webpage display:
+
+* [AB_05_R1_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R1_fastq_fastqc.html)
+* [AB_05_R2_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R2_fastq_fastqc.html)
 
 
 
