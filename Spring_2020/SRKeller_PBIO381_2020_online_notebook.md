@@ -89,6 +89,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 ------
 <div id='id-section1'/>
+
 ### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
 
 * Ask Lauren to give a brief intro on using git to create a repo and document your work in a lab notebook; push to origin on github
