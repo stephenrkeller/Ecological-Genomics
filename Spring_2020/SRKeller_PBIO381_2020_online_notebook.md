@@ -116,10 +116,78 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 <div id='id-section2'/>
 ### Page 2: 2018-01-29 
 
+Here's the code we used to run FastQC:
+
+```
+#!/bin/bash 
+
+# Pipeline to assess sequencing quality of RS exome sequences
+
+# Set your repo address here -- double check carefully!
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+# Make a new folder within 'myresults' to hold your fastqc outputs
+mkdir ${myrepo}/myresults/fastqc
+
+# Each student gets assigned a population to work with:
+mypop="AB" 
+
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/${mypop}"
+
+#  Run fastqc program in a loop, processing all files that contain your population code
+for file in ${input}*fastq.gz
+
+do
+
+ fastqc ${file} -o ${myrepo}/myresults/fastqc
+ echo -e "\n\n   Results saved to ${myrepo}/myresults/fastqc...on to the next one!   \n\n"
+
+done
+```
+
+
 Example output from FastQC -- copied to my 'docs' folder on GitHub for webpage display:
 
 * [AB_05_R1_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R1_fastq_fastqc.html)
 * [AB_05_R2_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R2_fastq_fastqc.html)
+
+We then moved onto read trimming using Trimmomatic:
+
+```
+#!/bin/bash   
+ 
+cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
+ 
+mkdir pairedcleanreads
+mkdir unpairedcleanreads
+
+for R1 in AB*R1_fastq.gz  
+
+do 
+ 
+ R2=${R1/_R1_fastq.gz/_R2_fastq.gz}
+ short=`echo $R1 | cut -c1-5`
+ echo $short 
+java -classpath /data/popgen/Trimmomatic-0.33/trimmomatic-0.33.jar org.usadellab.trimmomatic.TrimmomaticPE \
+        -threads 10 \
+        -phred33 \
+         "$R1" \
+         "$R2" \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R1.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R1.cl.un.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R2.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R2.cl.un.fq \
+        ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 \
+        LEADING:20 \
+        TRAILING:20 \
+        SLIDINGWINDOW:6:20 \
+        HEADCROP:12 \
+        MINLEN:35 
+ 
+done 
+
+```
 
 
 
