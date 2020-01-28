@@ -89,6 +89,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 ------
 <div id='id-section1'/>
+
 ### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
 
 * Ask Lauren to give a brief intro on using git to create a repo and document your work in a lab notebook; push to origin on github
@@ -116,11 +117,216 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 <div id='id-section2'/>
 ### Page 2: 2018-01-29 
 
+Here's the code we used to run FastQC:
+
+```
+#!/bin/bash 
+
+# Pipeline to assess sequencing quality of RS exome sequences
+
+# Set your repo address here -- double check carefully!
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+# Make a new folder within 'myresults' to hold your fastqc outputs
+mkdir ${myrepo}/myresults/fastqc
+
+# Each student gets assigned a population to work with:
+mypop="AB" 
+
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/${mypop}"
+
+#  Run fastqc program in a loop, processing all files that contain your population code
+for file in ${input}*fastq.gz
+
+do
+
+ fastqc ${file} -o ${myrepo}/myresults/fastqc
+ echo -e "\n\n   Results saved to ${myrepo}/myresults/fastqc...on to the next one!   \n\n"
+
+done
+```
+
+
 Example output from FastQC -- copied to my 'docs' folder on GitHub for webpage display:
 
 * [AB_05_R1_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R1_fastq_fastqc.html)
 * [AB_05_R2_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R2_fastq_fastqc.html)
 
+We then moved onto read trimming using Trimmomatic:
+
+```
+#!/bin/bash   
+ 
+cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
+ 
+mkdir pairedcleanreads
+mkdir unpairedcleanreads
+
+for R1 in AB*R1_fastq.gz  
+
+do 
+ 
+ R2=${R1/_R1_fastq.gz/_R2_fastq.gz}
+ short=`echo $R1 | cut -c1-5`
+ echo $short 
+java -classpath /data/popgen/Trimmomatic-0.33/trimmomatic-0.33.jar org.usadellab.trimmomatic.TrimmomaticPE \
+        -threads 10 \
+        -phred33 \
+         "$R1" \
+         "$R2" \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R1.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R1.cl.un.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R2.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R2.cl.un.fq \
+        ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 \
+        LEADING:20 \
+        TRAILING:20 \
+        SLIDINGWINDOW:6:20 \
+        HEADCROP:12 \
+        MINLEN:35 
+ 
+done 
+
+```
+
+Lastly, we'll start mapping to the reference genome using BWA and use a bash script to process the resulting bam files to:
+* sort
+* mark and remove PCR duplicates
+* sort again, and then index for quick processing later
+
+Here's the mapping code:
+
+```
+#!/bin/bash
+
+# Reference genome for aligning our reads
+
+# Note -- this is a reduced version of the full Picea abies genome (>20 Gb!), containing just scaffolds with probes for our exome seqs
+ref="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
+
+#number of CPU used -- set conservatively
+t=1
+
+# Indexing the genome -- already done.  In the future, you'll need this step if working on a new project/genome
+#bwa index ${ref}
+
+# Aligning individual sequences to the reference
+
+for forward in ${input}*_R1.cl.pd.fq
+do
+	reverse=${forward/_R1.cl.pd.fq/_R2.cl.pd.fq}
+	f=${forward/_R1.cl.pd.fq/}
+	name=`basename ${f}`
+	echo "@ Aligning $name..."
+	bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+done
+
+### Sorting SAM files and converting to BAM files
+###  Note, a similar program to samtools that is faster for 'view', 'flagstat', and 'markdup' is sambamba.  Use it when possible.
+
+for f in ${output}/BWA/*.sam
+do
+	out=${f/.sam/}
+	sambamba-0.7.1-linux-static view -S --format=bam ${f} -o ${out}.bam
+	samtools sort ${out}.bam -o ${out}.sorted.bam
+	rm ${out}.bam
+done
+
+```
+
+And lastly the post-processing of the bam files:
+
+```
+#!/bin/bash
+
+### Removing PCR duplicates
+for file in ${output}/BWA/${mypop}*.sorted.bam
+do
+	f=${file/.sorted.bam/}
+	sambamba-0.7.1-linux-static markdup -r -t 10 ${file} ${f}.rmdup.bam
+	samtools sort ${f}.rmdup.bam -o ${f}.sorted.rmdup.bam
+done
+
+
+# Stats on bwa alignments
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	f=${file/.sorted.rmdup.bam/}
+	name=`basename ${f}`
+	echo ${name} >> ${myrepo}/myresults/${mypop}.names.txt
+	samtools flagstat ${file} | awk 'NR>=5&&NR<=13 {print $1}' | column -x
+done >> ${myrepo}/myresults/${mypop}.flagstats.txt
+
+
+# Reads mapping quality scores
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools view ${file} | awk '$5>=0{c0++}; $5>0{c1++}; $5>9{c9++}; $5>19{c19++}; $5>29{c29++};  END {print c0 " " c1 " " c9 " " c19 " " c29}'
+done >> ${myrepo}/myresults/${mypop}.Qscores.txt
+
+# Nucleotide coverage
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools depth ${file} | awk '{sum+=$3} END {print sum/NR}'
+done >> ${myrepo}/myresults/${mypop}.coverage.txt
+
+R --vanilla <<EOF
+
+	reads_Q = read.table("${myrepo}/myresults/${mypop}.Qscores.txt",header = FALSE)
+	mean_cov = read.table("${myrepo}/myresults/${mypop}.coverage.txt",header = FALSE)
+	ind_names = read.table("${myrepo}/myresults/${mypop}.names.txt", header = FALSE)
+	qual_res = cbind (ind_names, reads_Q, mean_cov)
+	colnames(qual_res) = c("Individuals", "Total_reads", "Total_mapped", "Total_mapq10", "Total_mapq20", "Total_mapq30", "Mean_cov")
+	write.table(qual_res, "${myrepo}/myresults/${mypop}_MappingResults.txt")
+EOF
+
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools index ${file}
+done
+
+```
+
+To make our scripts not too liong and cumbersome, and to enable more focused troubleshooting if bugs arise, we separated each of these major functions into the own scripts, and then ran them using a shell-script wrapper:
+
+```
+#!/bin/bash
+
+# Pipeline to process and map RS exome sequences
+
+# Set your repo address here -- double check carefully!
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+# Each student gets assigned a population to work with:
+mypop="AB"
+
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
+
+
+# Output dir to store mapping files (bam)
+output="/data/project_data/RS_ExomeSeq/mapping"
+
+
+#  Trim reads and count numbers of cleaned and paired reads
+
+cd ${myrepo}/myscripts
+
+source ./trimmedReadCounts.sh
+
+
+#  Map reads to ref genome using BWA
+
+source ./mapping.sh
+
+
+# Take sequence alignment  (sam) files and convert to bam>sort>remove PCR dups>sort again>index
+# Calculate alignment stats for each individual and create table for my population
+
+source ./process_bam.sh
+
+```
 
 
 ------

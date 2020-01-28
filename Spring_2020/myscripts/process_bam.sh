@@ -9,7 +9,7 @@ do
 done
 
 
-# Stats on bwa alignments
+### Stats on bwa alignments
 for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
 do
 	f=${file/.sorted.rmdup.bam/}
@@ -19,13 +19,13 @@ do
 done >> ${myrepo}/myresults/${mypop}.flagstats.txt
 
 
-# Reads mapping quality scores
+### Reads mapping quality scores
 for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
 do
 	samtools view ${file} | awk '$5>=0{c0++}; $5>0{c1++}; $5>9{c9++}; $5>19{c19++}; $5>29{c29++};  END {print c0 " " c1 " " c9 " " c19 " " c29}'
 done >> ${myrepo}/myresults/${mypop}.Qscores.txt
 
-# Nucleotide coverage
+### Nucleotide coverage
 for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
 do
 	samtools depth ${file} | awk '{sum+=$3} END {print sum/NR}'
