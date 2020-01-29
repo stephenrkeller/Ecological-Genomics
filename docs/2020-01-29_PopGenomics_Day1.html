@@ -215,7 +215,11 @@ do
 
 done</code></pre>
 <p>Let’s write the above into a script using the Vim text editor at the command line. Type <code>vim</code> to get into the editor, then type “i” to enter INSERT mode. You can then type your script (remember to make necessary changes to the population code and output path). Lastly, to save the file and quit Vim, hit the ESCAPE key to get out of INSERT mode, followed by <code>:wq fastqc.sh</code></p>
-<p>Back at the command line, you should be able to <code>ll</code> and see your new script! To run it, type <code>./fastqc.sh</code></p>
+<p>Back at the command line, you should be able to <code>ll</code> and see your new script!</p>
+<div id="you-may-find-that-you-need-to-change-the-permission-on-your-script-to-make-it-executable.-do-this-using-chmod-ux-which-changes-the-permissions-to-give-the-user-you-permission-to-execute-x.-then-give-it-a-run" class="section level4">
+<h4>You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x). Then give it a run!</h4>
+<pre><code>chmod u+x fastqc.sh    # makes the script &quot;executable&quot; by the &quot;user&quot;
+./fastqc.sh             # executes the script</code></pre>
 <p>It’ll take just a couple of minutes per fastq file. Once you’ve got results, let’s look at them by pushing your html files up to your Github. Remember,</p>
 <pre><code>git pull
 git add --all .
@@ -223,6 +227,7 @@ git commit -m &quot;note&quot;
 git push</code></pre>
 <p>Once synced to Github, use Github desktop to pull them down to your laptop where you can open them with a browser.</p>
 <p><em>How does the quality look?</em></p>
+</div>
 </div>
 <div id="clean-using-trimmomatic" class="section level3">
 <h3>Clean using Trimmomatic</h3>
@@ -278,16 +283,11 @@ LEADING: Cut bases off the start of a read, if below a threshold quality
 TRAILING: Cut bases off the end of a read, if below a threshold quality
 SLIDINGWINDOW: Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold.
 MINLEN: Drop the read if it is below a specified length</code></pre>
-<div id="you-may-find-that-you-need-to-change-the-permission-on-your-script-to-make-it-executable.-do-this-using-chmod-ux-which-changes-the-permissions-to-give-the-user-you-permission-to-execute-x.-then-give-it-a-run" class="section level4">
-<h4>You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x). Then give it a run!</h4>
-<pre><code>chmod u+x trim_loop.sh    # makes the script &quot;executable&quot; by the &quot;user&quot;
-./trim_loop.sh              # executes the script</code></pre>
-</div>
 </div>
 <div id="visualize-again-using-fastqc" class="section level3">
 <h3>Visualize again using FastQC</h3>
 <p>Check the quality of one of your cleaned files using fastqc again.</p>
-<pre><code>                # You fill in the blank!</code></pre>
+<pre><code>                # You fill in the blank!  Don't forget to change your input path to the pairedcleaned files!</code></pre>
 </div>
 </div>
 <div id="mapping-cleaned-and-trimmed-reads-against-the-reference-genome" class="section level2">

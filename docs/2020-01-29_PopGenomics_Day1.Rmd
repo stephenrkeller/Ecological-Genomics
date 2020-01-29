@@ -171,8 +171,14 @@ done
 
 Let's write the above into a script using the Vim text editor at the command line. Type `vim` to get into the editor, then type "i" to enter INSERT mode.  You can then type your script (remember to make necessary changes to the population code and output path).  Lastly, to save the file and quit Vim, hit the ESCAPE key to get out of INSERT mode, followed by `:wq fastqc.sh`
 
-Back at the command line, you should be able to `ll` and see your new script!  To run it, type 
-`./fastqc.sh`
+Back at the command line, you should be able to `ll` and see your new script!  
+
+#### You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x).  Then give it a run!
+
+```
+chmod u+x fastqc.sh    # makes the script "executable" by the "user"
+./fastqc.sh  		    # executes the script
+```
 
 It'll take just a couple of minutes per fastq file.  Once you've got results, let's look at them by pushing your html files up to your Github.  Remember, 
 
@@ -255,19 +261,12 @@ SLIDINGWINDOW: Perform a sliding window trimming, cutting once the average quali
 MINLEN: Drop the read if it is below a specified length
 ```
 
-#### You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x).  Then give it a run!
-
-```
-chmod u+x trim_loop.sh    # makes the script "executable" by the "user"
-./trim_loop.sh  		    # executes the script
-```
-
 ### Visualize again using FastQC
 
 Check the quality of one of your cleaned files using fastqc again.
 
 ```
-				# You fill in the blank!
+				# You fill in the blank!  Don't forget to change your input path to the pairedcleaned files!
 ```
 
 ## 6. Mapping cleaned and trimmed reads against the reference genome
