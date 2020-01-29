@@ -11,8 +11,8 @@ fontsize: 18pt
 
 1. To get background on the ecology of Red spruce (*Picea rubens*), and the experimental design of the exome capture data
 2. To understand the general work flow or "pipeline" for processing and analyzing the exome capture sequence data
-3. To learn how to make/write a bash script, and how to use bash commands to process files in batches 
-4. To visualize and interpret Illumina data quality (what is a fastq file; what are Phred scores?).
+3. To visualize and interpret Illumina data quality (what is a fastq file; what are Phred scores?).
+4. To learn how to make/write a bash script, and how to use bash commands to process files in batches 
 5. To trim the reads based on base quality scores
 6. To start mapping (a.k.a. aligning) each set of cleaned reads to a reference genome
 
@@ -61,14 +61,14 @@ With funding from the National Science Foundation, the Keller Lab is studying th
 
 2. Calculate #'s of cleaned, high quality reads going into mapping
 
-3. Map (a.k.a. Align) cleaned reads from each sample to the reference assembly to generate **s**equence **a**lign**m**ent files (Program: bwa, Input: *.fastq, Output: *.sam).  NOTE:  we'll be using a reduced reference genome based on selecting only those scaffolds of the full genome reference that contain at least one bait.  The reference genome is based on Norway spruce (*P. abies*) and is available from [congenie.org](http://congenie.org).  
+3. Map (a.k.a. Align) cleaned reads from each sample to the reference assembly to generate **s**equence **a**lign**m**ent files (Program: bwa, Input: *.fastq, Output: *.sam).  
 
 4. Remove PCR duplicates identified during mapping, and calculate alignment statistics (% of reads mapping succesully, mapping quality scores, average depth of coverage per individual)
 
-We'll then ue the results of our mapping next week to start estimating diversity and population structure.
+We'll then use the results of our mapping next week to start estimating diversity and population structure.
 
 
-## 3. Visualize, Clean, and Visualize again
+## 3-5. Visualize, Clean, and Visualize again
 
 Whenever you get a new batch of NGS data, the first step is to look at the data quality of coming off the sequencer and see if we notice any problems with base quality, sequence length, PCR duplicates, or adapter contamination.  
 
@@ -270,6 +270,48 @@ Check the quality of one of your cleaned files using fastqc again.
 ```
 				# You fill in the blank!
 ```
+
+## 6. Mapping cleaned and trimmed reads against the reference genome
+
+Now that we have cleaned and trimmed read pairs, we're ready to map them against the reference genome.  
+
+* We'll be using a reduced reference genome based on selecting only those scaffolds of the full genome reference that contain at least one bait.  We've placed it on our server here:
+
+`/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa`
+
+* The reference genome is based on Norway spruce (*P. abies*) and is available from [congenie.org](http://congenie.org).
+
+* We'll use the program [bwa](https://github.com/lh3/bwa), which is a very efficient and very well vetted read mapper.  Lots of others exist and can be useful to explore for future datasets.  We tried several, and for our exome data, bwa seems to be the best
+
+* We are going to write a bash script together that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  The resulting output will be a sam file alignment.  The basic bwa command we'll use is:
+
+```
+bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+
+```
+where 
+```
+${t} is the number of threads, or computer cpus to use
+-M labels a read with a special flag if its mapping is split across >1 contig
+-a keeps alignments involving unpaired reads
+${ref} specifies the path and filename for the reference genome
+${forward} specifies the path and filename for the cleaned and trimmed R1 reads 
+${reverse} specifies the path and filename for the cleaned and trimmed R2 reads 
+>${output}/BWA/${name}.sam  directs the .sam file to be saved into a directory called BWA
+```
+
+Other bwa options detailed here:  [bwa manual page](http://bio-bwa.sourceforge.net/bwa.shtml)
+
+Our last steps are to:
+1. Convert our sam files to the more efficient binary version (bam) and sort them
+2. Get some stats on how well the mapping worked 
+3. Get rid of any PCR duplicate sequences (why are these a problem?) 
+4. Sort again and index the bam files for our downtream population genetic analyses.
+
+For this, we'll use a combination of two new programs:  [samtools](https://github.com/samtools/samtools) and [sambamba](https://lomereiter.github.io/sambamba/).  Samtools was writtend by Heng Li, the same person who wrote bwa, and is a powerful tool for manipulating sam/bam files.  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed).  We'll use them both at different steps.
+
+
+
 
 
 

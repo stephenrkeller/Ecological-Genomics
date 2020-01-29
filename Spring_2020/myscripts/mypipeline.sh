@@ -16,21 +16,18 @@ input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}
 output="/data/project_data/RS_ExomeSeq/mapping"
 
 
-#  Trim reads and count numbers of cleaned and paired reads
-
 cd ${myrepo}/myscripts
 
-source ./trimmedReadCounts.sh
+#  Trim reads 
+source ./trim_loop.sh
 
 
 #  Map reads to ref genome using BWA
-
 source ./mapping.sh
 
 
 # Take sequence alignment  (sam) files and convert to bam>sort>remove PCR dups>sort again>index
 # Calculate alignment stats for each individual and create table for my population
-
 source ./process_bam.sh
 
 

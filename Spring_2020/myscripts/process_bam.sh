@@ -1,5 +1,14 @@
 #!/bin/bash
 
+### Sorting SAM files and converting to BAM files
+for f in ${output}/BWA/*.sam
+do
+	out=${f/.sam/}
+	sambamba-0.7.1-linux-static view -S --format=bam ${f} -o ${out}.bam
+	samtools sort ${out}.bam -o ${out}.sorted.bam
+	rm ${out}.bam
+done
+
 ### Removing PCR duplicates
 for file in ${output}/BWA/${mypop}*.sorted.bam
 do
@@ -19,35 +28,11 @@ do
 done >> ${myrepo}/myresults/${mypop}.flagstats.txt
 
 
-### Reads mapping quality scores
-for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
-do
-	samtools view ${file} | awk '$5>=0{c0++}; $5>0{c1++}; $5>9{c9++}; $5>19{c19++}; $5>29{c29++};  END {print c0 " " c1 " " c9 " " c19 " " c29}'
-done >> ${myrepo}/myresults/${mypop}.Qscores.txt
-
 ### Nucleotide coverage
 for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
 do
 	samtools depth ${file} | awk '{sum+=$3} END {print sum/NR}'
 done >> ${myrepo}/myresults/${mypop}.coverage.txt
 
-#R --vanilla <<EOF
-#
-#	reads_Q = read.table("${myrepo}/myresults/${mypop}.Qscores.txt",header = FALSE)
-#	mean_cov = read.table("${myrepo}/myresults/${mypop}.coverage.txt",header = FALSE)
-#	ind_names = read.table("${myrepo}/myresults/${mypop}.names.txt", header = FALSE)
-#	qual_res = cbind (ind_names, reads_Q, mean_cov)
-#	colnames(qual_res) = c("Individuals", "Total_reads", "Total_mapped", "Total_mapq10", "Total_mapq20", "Total_mapq30", "Mean_cov")
-#	write.table(qual_res, "${myrepo}/myresults/${mypop}_MappingResults.txt")
-#EOF
 
-for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
-do
-	samtools index ${file}
-done
 
-# Deleting temporary files to save space
-#rm ${output}/BWA/${mypop}*.sam
-#rm ${output}/BWA/${mypop}*.sam
-#rm ${output}/BWA/${mypop}*.rmdup.bam
-#rm ${output}/BWA/${mypop}*.rmdup.bam.bai

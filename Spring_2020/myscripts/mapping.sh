@@ -22,14 +22,4 @@ do
 	bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
 done
 
-### Sorting SAM files and converting to BAM files
-###  Note, a similar program to samtools that is faster for 'view', 'flagstat', and 'markdup' is sambamba.  Use it when possible.
-
-for f in ${output}/BWA/*.sam
-do
-	out=${f/.sam/}
-	sambamba-0.7.1-linux-static view -S --format=bam ${f} -o ${out}.bam
-	samtools sort ${out}.bam -o ${out}.sorted.bam
-	rm ${out}.bam
-done
 
