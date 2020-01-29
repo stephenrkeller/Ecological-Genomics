@@ -1,7 +1,16 @@
 #!/bin/bash
 
-# Reference genome for aligning our reads
+# Each student gets assigned a population to work with:
+mypop="AB"
 
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
+
+
+# Output dir to store mapping files (bam)
+output="/data/project_data/RS_ExomeSeq/mapping"
+
+# Reference genome for aligning our reads
 # Note -- this is a reduced version of the full Picea abies genome (>20 Gb!), containing just scaffolds with probes for our exome seqs
 ref="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
 
