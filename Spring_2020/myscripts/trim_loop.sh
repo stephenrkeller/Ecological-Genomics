@@ -2,9 +2,7 @@
  
 cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
  
-mypop="AB"
-
-for R1 in ${mypop}*R1_fastq.gz  
+for R1 in AB*R1_fastq.gz  
 
 do 
  
