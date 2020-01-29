@@ -10,12 +10,11 @@ input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}
 # Output dir to store mapping files (bam)
 output="/data/project_data/RS_ExomeSeq/mapping"
 
+
 # Reference genome for aligning our reads
 # Note -- this is a reduced version of the full Picea abies genome (>20 Gb!), containing just scaffolds with probes for our exome seqs
 ref="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
 
-#number of CPU used -- set conservatively
-t=1
 
 # Indexing the genome -- already done.  In the future, you'll need this step if working on a new project/genome
 #bwa index ${ref}
@@ -28,7 +27,7 @@ do
 	f=${forward/_R1.cl.pd.fq/}
 	name=`basename ${f}`
 	echo "@ Aligning $name..."
-	bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+	bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
 done
 
 

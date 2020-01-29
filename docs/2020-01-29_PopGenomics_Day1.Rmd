@@ -68,7 +68,7 @@ With funding from the National Science Foundation, the Keller Lab is studying th
 We'll then use the results of our mapping next week to start estimating diversity and population structure.
 
 
-## 3-5. Visualize, Clean, and Visualize again
+## 3.-5. Visualize, Clean, and Visualize again
 
 Whenever you get a new batch of NGS data, the first step is to look at the data quality of coming off the sequencer and see if we notice any problems with base quality, sequence length, PCR duplicates, or adapter contamination.  
 
@@ -169,7 +169,13 @@ do
 done
 ```
 
-Once you've got results, push your html files up to your Github.  Remember, 
+Let's write the above into a script using the Vim text editor at the command line. Type `vim` to get into the editor, then type "i" to enter INSERT mode.  You can then type your script (remember to make necessary changes to the population code and output path).  Lastly, to save the file and quit Vim, hit the ESCAPE key to get out of INSERT mode, followed by `:wq fastqc.sh`
+
+Back at the command line, you should be able to `ll` and see your new script!  To run it, type 
+`./fastqc.sh`
+
+It'll take just a couple of minutes per fastq file.  Once you've got results, let's look at them by pushing your html files up to your Github.  Remember, 
+
 ```
 git pull
 git add --all .
@@ -180,41 +186,37 @@ Once synced to Github, use Github desktop to pull them down to your laptop where
 
 *How does the quality look?*
 
+
 ### Clean using Trimmomatic
 
 [We'll use the Trimmomatic program](http://www.usadellab.org/cms/index.php?page=trimmomatic) to clean the reads for each file. The program is already installed on our server.
 
 We've provided an example script in the `/data/scripts/` directory this time because the program is a java based program and thus a bit more particular in its call.  
 
-1. Copy the bash script over to your ~/<myrepo>/myscripts directory
-2. Open and edit the bash script using the program vim.  At the command line, simply type `vim`
+1. Copy the bash script over to your ~/myrepo/myscripts directory
+2. Open and edit the bash script using the program vim.  
 3. Edit the file so that you're trimming the fastq files for the population assigned to you
 4. Change the permissions on your script to make it executable, then run it!  (examples below)
 
 ```
-cp /data/scripts/trim_loop.sh  ~/<myrepo>/myscripts/ # copies the script to your home scripts dir
-vim trim_loop.sh						  # open the script with vim to edit
+cp /data/scripts/trim_loop.sh  ~/myrepo/myscripts/ # copies the script to your home scripts dir
+vim trim_loop.sh	# open the script with vim to edit
 ```
-This time we use the ${} designation multiple times.  The first is to define our population (be sure to change the "mypop" value to yours!).  
-
-We use a couple of other lines to create new variables we use within the loop:
-define the name for the second read in the pair (R2) and create a basename that only contains the "pop_ind" part of the name, i.e. AB_05
+This time we use the variable coding to call the name of the R1 read pair, define the name for the second read in the pair (R2), and create a basename that only contains the "pop_ind" part of the name, i.e. AB_05
 ```
 	R2=${R1/_R1_fastq.gz/_R2_fastq.gz}   # defines the name for the second read in the pair (R2) based on knowing the R1 name (the file names are identifcal except for the R1 vs. R2 designation)
 	f=${R1/_R1_fastq.gz/}   # creates a new variable from R1 that has the "_R1_fastq.gz" stripped off
 	name=`basename ${f}`   # calls the handy "basename" function to define a new variable containing only the very last part of the filename while stripping off all the path information.  This gets us the "AB_05" bit we want.
 ```
 
-OK, now in a loop:
+Here's how it should look (replace AB with your population name):
 
 ```
 #!/bin/bash   
  
 cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
- 
-mypop="AB"
 
-for R1 in ${mypop}*R1_fastq.gz  
+for R1 in AB*R1_fastq.gz  
 
 do 
  
@@ -256,9 +258,9 @@ HEADCROP: Cut the specified number of bases from the start of the read
 MINLEN: Drop the read if it is below a specified length
 ```
 
-#### Now, change the permission on your script to make it executable, and then give it a run!
+#### You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x).  Then give it a run!
 
-```bash
+```
 chmod u+x trim_loop.sh    # makes the script "executable" by the "user"
 ./trim_loop.sh  		    # executes the script
 ```
@@ -286,12 +288,12 @@ Now that we have cleaned and trimmed read pairs, we're ready to map them against
 * We are going to write a bash script together that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  The resulting output will be a sam file alignment.  The basic bwa command we'll use is:
 
 ```
-bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
 
 ```
 where 
 ```
-${t} is the number of threads, or computer cpus to use
+-t 1 is the number of threads, or computer cpus to use (in this case, just 1)
 -M labels a read with a special flag if its mapping is split across >1 contig
 -a keeps alignments involving unpaired reads
 ${ref} specifies the path and filename for the reference genome
@@ -302,13 +304,35 @@ ${reverse} specifies the path and filename for the cleaned and trimmed R2 reads
 
 Other bwa options detailed here:  [bwa manual page](http://bio-bwa.sourceforge.net/bwa.shtml)
 
-Our last steps are to:
+Our last steps (with basic syntax) are to:
 1. Convert our sam files to the more efficient binary version (bam) and sort them
-2. Get some stats on how well the mapping worked 
-3. Get rid of any PCR duplicate sequences (why are these a problem?) 
-4. Sort again and index the bam files for our downtream population genetic analyses.
++ `sambamba-0.7.1-linux-static view -S --format=bam file.sam -o file.bam`
+
+2. Get rid of any PCR duplicate sequences (why are these a problem?) and re-sort after removing dups
++ `sambamba-0.7.1-linux-static markdup -r -t 1 file.bam file.rmdup.bam`
++ `samtools sort file.rmdup.bam -o file.sorted.rmdup.bam`
+
+3. Get some stats on how well the mapping worked 
++ `samtools flagstat file.sorted.rmdup.bam | awk 'NR>=5&&NR<=13 {print $1}' | column -x` 
++ `samtools depth file.sorted.rmdup.bam | awk '{sum+=$3} END {print sum/NR}`
+
+
 
 For this, we'll use a combination of two new programs:  [samtools](https://github.com/samtools/samtools) and [sambamba](https://lomereiter.github.io/sambamba/).  Samtools was writtend by Heng Li, the same person who wrote bwa, and is a powerful tool for manipulating sam/bam files.  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed).  We'll use them both at different steps.
+
+I've put a bash script with the commands to run steps 1-3 above.  It's located here:
+
+`/data/scripts/process_bam.sh`
+
+Make a copy of this over to your home directory and use `vim` to edit the paths and population.  Then when you're ready to save and quit vim, type `:wq`
+
+Last step, we're going to put these scripts altogether into a "wrapper" that will exectue each of them one after the other, and work for us while we're off getting a coffee or sleeping.  :)  I'll show you how to code this together in class.
+
+Once your wrapper script is ready, you're going to want to start a `screen`.  The `screen` command initiates a new shell window that won't interupt or stop your work if you close your computer, log off the server, or leave the UVM network.  Anytime you're running long jobs, you definiteily want to use `screen`.
+
+Using it is easy.  Just type `screen` followed by <Enter>.  It will take you to a new empyt terminal. You can then start your wrapper bash script and see that it starts running.  Once everything looks good, you have to detach from the screen by typing Ctrl-A + Ctrl-D.  If you don't do this, you'll lose your work!
+
+When you're ready to check back on the progress of your program, you can recover your screen by typing `screen -r`.  That'll re-attach you back to your program!
 
 
 

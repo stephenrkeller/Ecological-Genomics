@@ -18,71 +18,6 @@
 
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css" data-origin="pandoc">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-
-/* A workaround for https://github.com/jgm/pandoc/issues/4278 */
-a.sourceLine {
-  pointer-events: auto;
-}
-
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
-</script>
 
 
 
@@ -167,7 +102,7 @@ a.sourceLine {
 <p>We’ll then use the results of our mapping next week to start estimating diversity and population structure.</p>
 </div>
 <div id="visualize-clean-and-visualize-again" class="section level2">
-<h2>3-5. Visualize, Clean, and Visualize again</h2>
+<h2>3.-5. Visualize, Clean, and Visualize again</h2>
 <p>Whenever you get a new batch of NGS data, the first step is to look at the data quality of coming off the sequencer and see if we notice any problems with base quality, sequence length, PCR duplicates, or adapter contamination.</p>
 <p>You’ll each be in charge of cleaning and visualizing the left (R1) and right (R2) files from a single sample.</p>
 <p>We’re going to assign each student to analyze all the sequence files from one population. (We’ll do this in class)</p>
@@ -279,7 +214,9 @@ do
  fastqc ${file} -o ~/&lt;myrepo&gt;/myresults/fastqc
 
 done</code></pre>
-<p>Once you’ve got results, push your html files up to your Github. Remember,</p>
+<p>Let’s write the above into a script using the Vim text editor at the command line. Type <code>vim</code> to get into the editor, then type “i” to enter INSERT mode. You can then type your script (remember to make necessary changes to the population code and output path). Lastly, to save the file and quit Vim, hit the ESCAPE key to get out of INSERT mode, followed by <code>:wq fastqc.sh</code></p>
+<p>Back at the command line, you should be able to <code>ll</code> and see your new script! To run it, type <code>./fastqc.sh</code></p>
+<p>It’ll take just a couple of minutes per fastq file. Once you’ve got results, let’s look at them by pushing your html files up to your Github. Remember,</p>
 <pre><code>git pull
 git add --all .
 git commit -m &quot;note&quot;
@@ -292,26 +229,24 @@ git push</code></pre>
 <p><a href="http://www.usadellab.org/cms/index.php?page=trimmomatic">We’ll use the Trimmomatic program</a> to clean the reads for each file. The program is already installed on our server.</p>
 <p>We’ve provided an example script in the <code>/data/scripts/</code> directory this time because the program is a java based program and thus a bit more particular in its call.</p>
 <ol style="list-style-type: decimal">
-<li>Copy the bash script over to your ~/<myrepo>/myscripts directory</li>
-<li>Open and edit the bash script using the program vim. At the command line, simply type <code>vim</code></li>
+<li>Copy the bash script over to your ~/myrepo/myscripts directory</li>
+<li>Open and edit the bash script using the program vim.<br />
+</li>
 <li>Edit the file so that you’re trimming the fastq files for the population assigned to you</li>
 <li>Change the permissions on your script to make it executable, then run it! (examples below)</li>
 </ol>
-<pre><code>cp /data/scripts/trim_loop.sh  ~/&lt;myrepo&gt;/myscripts/ # copies the script to your home scripts dir
-vim trim_loop.sh                          # open the script with vim to edit</code></pre>
-<p>This time we use the ${} designation multiple times. The first is to define our population (be sure to change the “mypop” value to yours!).</p>
-<p>We use a couple of other lines to create new variables we use within the loop: define the name for the second read in the pair (R2) and create a basename that only contains the “pop_ind” part of the name, i.e. AB_05</p>
+<pre><code>cp /data/scripts/trim_loop.sh  ~/myrepo/myscripts/ # copies the script to your home scripts dir
+vim trim_loop.sh    # open the script with vim to edit</code></pre>
+<p>This time we use the variable coding to call the name of the R1 read pair, define the name for the second read in the pair (R2), and create a basename that only contains the “pop_ind” part of the name, i.e. AB_05</p>
 <pre><code>    R2=${R1/_R1_fastq.gz/_R2_fastq.gz}   # defines the name for the second read in the pair (R2) based on knowing the R1 name (the file names are identifcal except for the R1 vs. R2 designation)
     f=${R1/_R1_fastq.gz/}   # creates a new variable from R1 that has the &quot;_R1_fastq.gz&quot; stripped off
     name=`basename ${f}`   # calls the handy &quot;basename&quot; function to define a new variable containing only the very last part of the filename while stripping off all the path information.  This gets us the &quot;AB_05&quot; bit we want.</code></pre>
-<p>OK, now in a loop:</p>
+<p>Here’s how it should look (replace AB with your population name):</p>
 <pre><code>#!/bin/bash   
  
 cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
- 
-mypop=&quot;AB&quot;
 
-for R1 in ${mypop}*R1_fastq.gz  
+for R1 in AB*R1_fastq.gz  
 
 do 
  
@@ -346,10 +281,10 @@ TRAILING: Cut bases off the end of a read, if below a threshold quality
 CROP: Cut the read to a specified length
 HEADCROP: Cut the specified number of bases from the start of the read
 MINLEN: Drop the read if it is below a specified length</code></pre>
-<div id="now-change-the-permission-on-your-script-to-make-it-executable-and-then-give-it-a-run" class="section level4">
-<h4>Now, change the permission on your script to make it executable, and then give it a run!</h4>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">chmod</span> u+x trim_loop.sh    # makes the script <span class="st">&quot;executable&quot;</span> by the <span class="st">&quot;user&quot;</span>
-<span class="ex">./trim_loop.sh</span>              # executes the script</code></pre></div>
+<div id="you-may-find-that-you-need-to-change-the-permission-on-your-script-to-make-it-executable.-do-this-using-chmod-ux-which-changes-the-permissions-to-give-the-user-you-permission-to-execute-x.-then-give-it-a-run" class="section level4">
+<h4>You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x). Then give it a run!</h4>
+<pre><code>chmod u+x trim_loop.sh    # makes the script &quot;executable&quot; by the &quot;user&quot;
+./trim_loop.sh              # executes the script</code></pre>
 </div>
 </div>
 <div id="visualize-again-using-fastqc" class="section level3">
@@ -370,12 +305,40 @@ MINLEN: Drop the read if it is below a specified length</code></pre>
 <li><p>We’ll use the program <a href="https://github.com/lh3/bwa">bwa</a>, which is a very efficient and very well vetted read mapper. Lots of others exist and can be useful to explore for future datasets. We tried several, and for our exome data, bwa seems to be the best</p></li>
 <li><p>We are going to write a bash script together that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome. The resulting output will be a sam file alignment. The basic bwa command we’ll use is:</p></li>
 </ul>
-<pre><code>bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} &gt; ${output}/BWA/${name}.sam
+<pre><code>bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} &gt; ${output}/BWA/${name}.sam
 </code></pre>
-<p>where * ${t} is the number of threads, or computer cpus to use * -M labels a read with a special flag if its mapping is split across &gt;1 contig * -a keeps alignments involving unpaired reads * ${ref} specifies the path and filename for the reference genome * ${forward} specifies the path and filename for the cleaned and trimmed R1 reads * <span class="math inline">\({reverse} specifies the path and filename for the cleaned and trimmed R2 reads * &gt;\)</span>{output}/BWA/${name}.sam saves the .sam file into a directory called BWA</p>
+<p>where</p>
+<pre><code>-t 1 is the number of threads, or computer cpus to use (in this case, just 1)
+-M labels a read with a special flag if its mapping is split across &gt;1 contig
+-a keeps alignments involving unpaired reads
+${ref} specifies the path and filename for the reference genome
+${forward} specifies the path and filename for the cleaned and trimmed R1 reads 
+${reverse} specifies the path and filename for the cleaned and trimmed R2 reads 
+&gt;${output}/BWA/${name}.sam  directs the .sam file to be saved into a directory called BWA</code></pre>
 <p>Other bwa options detailed here: <a href="http://bio-bwa.sourceforge.net/bwa.shtml">bwa manual page</a></p>
-<p>Our last steps are to: 1. Convert our sam files to the more efficient binary version (bam) and sort them 2. Get some stats on how well the mapping worked 3. Get rid of any PCR duplicate sequences (why are these a problem?) 4. Sort again and index the bam files for our downtream population genetic analyses.</p>
+<p>Our last steps (with basic syntax) are to: 1. Convert our sam files to the more efficient binary version (bam) and sort them + <code>sambamba-0.7.1-linux-static view -S --format=bam file.sam -o file.bam</code></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Get rid of any PCR duplicate sequences (why are these a problem?) and re-sort after removing dups</li>
+</ol>
+<ul>
+<li><code>sambamba-0.7.1-linux-static markdup -r -t 1 file.bam file.rmdup.bam</code></li>
+<li><code>samtools sort file.rmdup.bam -o file.sorted.rmdup.bam</code></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Get some stats on how well the mapping worked</li>
+</ol>
+<ul>
+<li><code>samtools flagstat file.sorted.rmdup.bam | awk 'NR&gt;=5&amp;&amp;NR&lt;=13 {print $1}' | column -x</code></li>
+<li><code>samtools depth file.sorted.rmdup.bam | awk '{sum+=$3} END {print sum/NR}</code></li>
+</ul>
 <p>For this, we’ll use a combination of two new programs: <a href="https://github.com/samtools/samtools">samtools</a> and <a href="https://lomereiter.github.io/sambamba/">sambamba</a>. Samtools was writtend by Heng Li, the same person who wrote bwa, and is a powerful tool for manipulating sam/bam files. Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed). We’ll use them both at different steps.</p>
+<p>I’ve put a bash script with the commands to run steps 1-3 above. It’s located here:</p>
+<p><code>/data/scripts/process_bam.sh</code></p>
+<p>Make a copy of this over to your home directory and use <code>vim</code> to edit the paths and population. Then when you’re ready to save and quit vim, type <code>:wq</code></p>
+<p>Last step, we’re going to put these scripts altogether into a “wrapper” that will exectue each of them one after the other, and work for us while we’re off getting a coffee or sleeping. :) I’ll show you how to code this together in class.</p>
+<p>Once your wrapper script is ready, you’re going to want to start a <code>screen</code>. The <code>screen</code> command initiates a new shell window that won’t interupt or stop your work if you close your computer, log off the server, or leave the UVM network. Anytime you’re running long jobs, you definiteily want to use <code>screen</code>.</p>
+<p>Using it is easy. Just type <code>screen</code> followed by <Enter>. It will take you to a new empyt terminal. You can then start your wrapper bash script and see that it starts running. Once everything looks good, you have to detach from the screen by typing Ctrl-A + Ctrl-D. If you don’t do this, you’ll lose your work!</p>
+<p>When you’re ready to check back on the progress of your program, you can recover your screen by typing <code>screen -r</code>. That’ll re-attach you back to your program!</p>
 </div>
 </div>
 </section>
