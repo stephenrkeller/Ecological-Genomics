@@ -2,7 +2,7 @@
  
 cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
  
-for R1 in AB*R1_fastq.gz  
+for R1 in RP_*R1_fastq.gz  
 
 do 
  
