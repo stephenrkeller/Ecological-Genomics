@@ -340,31 +340,31 @@ Goals for tomorrow:
 1. Review read trim and QC processing from last week -- questions?
 2. Look at characteristics of the P. abies reference genome -- stats and discuss
 3. Set up mapping of exome capture reads to reference
-	-have students work on their assigned pops
-	-try coding one line at a time in outside text editor, with copy/paste to coimmand-line to check
-	-once checks look good, have them assmeble into full bash script
-	-review use of `screen` command to run process in backgroun with no hangup
+	- have students work on their assigned pops
+	- try coding one line at a time in outside text editor, with copy/paste to coimmand-line to check
+	- once checks look good, have them assmeble into full bash script
+	- review use of `screen` command to run process in backgroun with no hangup
 4. Look at some of the previously mapped bam files with `samtools tview`
-	-discuss sam/bam format
-	-look at read coverage and MAQ
+	- discuss sam/bam format
+	- look at read coverage and MAQ
 5. Discuss need for dealing with genotype uncertainty in downstream analyses
-	-introduce concepts from Nielsen 2011 (Nat. Rev. Genet.)
-	-focus on genotype likelihoods; use tools from ANGSD
+	- introduce concepts from Nielsen 2011 (Nat. Rev. Genet.)
+	- focus on genotype likelihoods; use tools from ANGSD
 	
 Work to get ready:
 
 * How many contigs in the reduced P. abies reference?  What is their size distribution?  Their N50?
 
-* Found this handy one-liner for calculating contig size in a multi-fasta file"
+* Found this handy one-liner for calculating contig size in a multi-fasta file:
 
 ```
 cat ../../ReferenceGenomes/Pabies1.0-genome_reduced.fa | awk '$0 ~ ">" {print c; c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' >../../Pabies1.0-genome_reduced_contigsizes.txt
 ```
 
 * Reduced ref stats:
-	-Total size = 668,091,227 bp (668 Mbp).  Compare to total P. abies genome size of 19600 Mbp (reduced = 3.4% of full)
-	-N contigs = 33,679
-	-N50 = 101,375 bp
+	- Total size = 668,091,227 bp (668 Mbp).  Compare to total P. abies genome size of 19600 Mbp (reduced = 3.4% of full)
+	- N contigs = 33,679
+	- N50 = 101,375 bp
 
 
 ------
