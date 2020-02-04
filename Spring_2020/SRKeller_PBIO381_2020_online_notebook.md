@@ -366,7 +366,7 @@ cat ../../ReferenceGenomes/Pabies1.0-genome_reduced.fa | awk '$0 ~ ">" {print c;
 	- N contigs = 33,679
 	- N50 = 101,375 bp
 
-* Compare to full P. abies genome (Nystedt et al. 2013)
+* Compare to full P. abies genome ([Nystedt et al. 2013](https://www.nature.com/articles/nature12211))
 
 ![](https://media.springernature.com/lw750/springer-static/image/art%3A10.1038%2Fnature12211/MediaObjects/41586_2013_Article_BFnature12211_Figa_HTML.jpg)
 
