@@ -28,7 +28,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 ### Table of contents for 60 entries (Format is *Page: Date(with year-month-day). Title*)        
 * [Page 1: 2020-01-22](#id-section1). Intro to Github, Markdown, and UNIX command-line
 * [Page 2: 2020-01-29](#id-section2). FastQC, read trimming, and mapping to reference genome
-* [Page 3:](#id-section3).
+* [Page 3: 2020-02-04](#id-section3). Reduced reference assembly stats; mapping exome capture reads; bam processing
 * [Page 4:](#id-section4).
 * [Page 5:](#id-section5).
 * [Page 6:](#id-section6).
@@ -288,7 +288,7 @@ done
 
 ```
 
-To make our scripts not too liong and cumbersome, and to enable more focused troubleshooting if bugs arise, we separated each of these major functions into the own scripts, and then ran them using a shell-script wrapper:
+To make our scripts not too long and cumbersome, and to enable more focused troubleshooting if bugs arise, we separated each of these major functions into the own scripts, and then ran them using a shell-script wrapper:
 
 ```
 #!/bin/bash
@@ -331,7 +331,46 @@ source ./process_bam.sh
 
 ------
 <div id='id-section3'/>
-### Page 3:
+### Page 3: 2020-02-04
+
+Getting some assembly stats on the Picea abies 1.0 reference genome, as well as the size and characteristics of our reduced reference.  
+
+Goals for tomorrow:
+
+1. Review read trim and QC processing from last week -- questions?
+2. Look at characteristics of the P. abies reference genome -- stats and discuss
+3. Set up mapping of exome capture reads to reference
+	- have students work on their assigned pops
+	- try coding one line at a time in outside text editor, with copy/paste to coimmand-line to check
+	- once checks look good, have them assmeble into full bash script
+	- review use of `screen` command to run process in backgroun with no hangup
+4. Look at some of the previously mapped bam files with `samtools tview`
+	- discuss sam/bam format
+	- look at read coverage and MAQ
+5. Discuss need for dealing with genotype uncertainty in downstream analyses
+	- introduce concepts from Nielsen 2011 (Nat. Rev. Genet.)
+	- focus on genotype likelihoods; use tools from ANGSD
+	
+Work to get ready:
+
+* How many contigs in the reduced P. abies reference?  What is their size distribution?  Their N50?
+
+* Found this handy one-liner for calculating contig size in a multi-fasta file:
+
+```
+cat ../../ReferenceGenomes/Pabies1.0-genome_reduced.fa | awk '$0 ~ ">" {print c; c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' >../../Pabies1.0-genome_reduced_contigsizes.txt
+```
+
+* Reduced ref stats:
+	- Total size = 668,091,227 bp (668 Mbp).  Compare to total P. abies genome size of 19600 Mbp (reduced = 3.4% of full)
+	- N contigs = 33,679
+	- N50 = 101,375 bp
+
+* Compare to full P. abies genome ([Nystedt et al. 2013](https://www.nature.com/articles/nature12211))
+
+![](https://media.springernature.com/lw750/springer-static/image/art%3A10.1038%2Fnature12211/MediaObjects/41586_2013_Article_BFnature12211_Figa_HTML.jpg)
+
+
 ------
 <div id='id-section4'/>
 ### Page 4:
