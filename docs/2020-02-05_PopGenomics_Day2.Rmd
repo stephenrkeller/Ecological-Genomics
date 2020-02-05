@@ -24,54 +24,53 @@ fontsize: 18pt
 
 Now that we have cleaned and trimmed read pairs, we're ready to map them against the reference genome.  
 
-The first step of read mapping is downloading the reference genome:
+The first step of read mapping is downloading the reference genome, freely available from [congenie.org](http://congenie.org):  ![](http://congenie.org/sites/all/themes/simply_modern/images/cnlogo4.png)
 
-The *Picea abies* reference genome is based on Norway spruce (*P. abies*) and is available from [congenie.org](http://congenie.org).
+The *Picea abies* reference genome is based on Norway spruce (*P. abies*) and [published by Nystedt et al. (2013)](https://www.nature.com/articles/nature12211).  
 
-You don't actually need to do this because we already have the file in the directory below.  But for future reference `wget` is a useful command.
+![](https://media.springernature.com/lw750/springer-static/image/art%3A10.1038%2Fnature12211/MediaObjects/41586_2013_Article_BFnature12211_Figa_HTML.jpg)
+
+
+You don't actually need to download the genome because we already have the file in the directory below.  But for future reference `wget` is a useful command to ownload files from the web.
 
 ```
 cd /data/project_data/RS_ExomeSeq/ReferenceGenomes/
 wget "http://plantgenie.org/Picea_abies/v1.0/FASTA/GenomeAssemblies/Pabies1.0-genome.fa.gz"
 ```
 
-Rather than trying to map to the entire 19.6 Gbp reference, we first subsetted the reference to include just the contigs that contain one or more probes in our exon capture experiment. For this, we did a BLAST search of each probe against the P. abies reference genome, and then retained all scaffolds that had a best hit.
+Rather than trying to map to the entire 19.6 Gbp reference (yikes!), we first subsetted the *P. abies* reference to include **just the contigs that contain one or more probes** from our exon capture experiment. For this, we did a BLAST search of each probe against the *P. abies* reference genome, and then retained all scaffolds that had a best hit.
 
-We then indexed this reduced reference genome for fast lookup during the mapping process.  That only needs to be done once, so we've done this step already, but here's the command.
-
-```
-$ bwa index /data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa
-```
 * This reduced reference contains:
   + 668,091,227 bp (~668 Mbp) in 33,679 contigs
   + The mean (median) contig size is 10.5 (12.9) kbp
   + The N50 of the reduced reference is 101,375 bp
 
-* The indexed redeuced reference genome to use for your mapping is on our server here:
+* The indexed reduced reference genome to use for your mapping is on our server here:
 
 `/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa`
 
 
-* To help make our scripting approach efficient, we want to specify the population of interest and the paths to the input and output directories.  We can do this by defining variables in bash, like so:
+### To help make our scripting approach efficient, we're going to write several short scripts, optimizing each one at a time, then put them together at the end
 
-```
-# Set your repo address here -- double check yours carefully!
-myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+* First, we want to specify the population of interest and the paths to the input and output directories.  We can do this by defining variables in bash, like so:
 
-# Each student gets assigned a population to work with:
-mypop="YOURPOP"
++ Set your repo address here -- double check yours carefully!
++ `myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"`
 
-#Directory with your pop-specific demultiplexed fastq files
-input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
++ Each student gets assigned a population to work with:
++ `mypop="YOURPOP"`"
+
++ Directory with your pop-specific demultiplexed fastq files
++ `input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"`
 
 
-# Output dir to store mapping files (bam)
-output="/data/project_data/RS_ExomeSeq/mapping"
-```
++ Output dir to store mapping files (bam)
++ `output="/data/project_data/RS_ExomeSeq/mapping"`
+
 
 * For mapping, we'll use the program [bwa](https://github.com/lh3/bwa), which is a very efficient and very well vetted read mapper.  Lots of others exist and can be useful to explore for future datasets.  We tried several, and for our exome data, bwa seems to be the best
 
-* Let's write a bash script called `mapping.sh` that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  We can test this out using one sample (individual) at a time, and then once the syntax is good and the bugs all worked out, we can scale this up to all the inds in our popuations.The basic bwa command we'll use is:
+* Let's write a bash script called `mapping.sh` that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  We can test this out using one sample (individual) at a time, and then once the syntax is good and the bugs all worked out, we can scale this up to all the inds in our popuations. The basic bwa command we'll use is below.  Think about how we should write this into a loop to call all the fastq files for our population of interest...(hint, look back at the `trim_loop.sh` script)
 
 ```
 bwa mem -t 1 -M ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
@@ -120,28 +119,31 @@ Find the official Sequence AlignMent file documentation can be found [here](http
 
 #### How can we get a summary of how well our reads mapped to the reference? 
 
-* We can use the samtools command `flagstats` to get some basic info on how well the mapping worked:
+* We can use the program [samtools](https://github.com/samtools/samtools) Written by Heng Li, the same person who wrote bwa. It is a powerful tool for manipulating sam/bam files.  
+
++ The command `flagstats` gets us some basic info on how well the mapping worked:
 
 + `samtools flagstat FILENAME.sam` 
 
 
-#### We can also query the Optional Flags for info
+#### Another option with LOTS of info is the samtools `stats` command
 
 * Let’s see how many of our reads map uniquely.  Use the -c option of `grep` to count the # of matches
 
-```
-$ grep -c XT:A:U FILENAME.sam 
++ `samtools stats FILENAME.sam` 
 
+...this can be combined with a grep statement to get just those lines beginning with SN:
 
-$ grep -c X0:i:1 FILENAME.sam
++ `samtools stats FILENAME.sam | grep ^SN`
 
-```
+#### After mapping, our next steps are to:
 
-#### After mapping, our next steps are to convert sam>bam, mark and remove the PCR duplicates, and then sort the bam alignment file.
+1. convert sam>bam, 
+2. mark and remove the PCR duplicates
+3. sort the bam alignment file
+4. index the sorted bam file for fast lookup
 
-To accomplish all of this, we'll use a combination of two new programs:
-
-+ [samtools](https://github.com/samtools/samtools) Written by Heng Li, the same person who wrote bwa. It is a powerful tool for manipulating sam/bam files.  
+To accomplish all of this, we'll use samtools as well as a companion program:
 
 + [sambamba](https://lomereiter.github.io/sambamba/).  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed). 
 

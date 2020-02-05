@@ -27,6 +27,13 @@ do
 	sambamba-0.7.1-linux-static markdup -r -t 1 ${file} ${f}.sorted.rmdup.bam
 done
 
+### Indexing for fast lookup
+
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools index ${file}
+done
+
 
 
 
