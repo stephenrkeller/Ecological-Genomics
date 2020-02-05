@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Each student gets assigned a population to work with:
-mypop="AB"
+mypop="AB_05"
 
 #Directory with demultiplexed fastq files
 input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
@@ -27,7 +27,8 @@ do
 	f=${forward/_R1.cl.pd.fq/}
 	name=`basename ${f}`
 	echo "@ Aligning $name..."
-	bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+	bwa mem -t 1 -M ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
 done
+
 
 
