@@ -2,25 +2,21 @@
 
 # Pipeline to process and map RS exome sequences
 
+cd ${myrepo}/myscripts
+
 # Set your repo address here -- double check carefully!
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
-
-# Each student gets assigned a population to work with:
-for mypop in HR MT RP WA 
-
-#Directory with demultiplexed fastq files
-input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
-
 
 # Output dir to store mapping files (bam)
 output="/data/project_data/RS_ExomeSeq/mapping"
 
+# Each student gets assigned a population to work with:
+for mypop in HR MT RP WA 
 
-cd ${myrepo}/myscripts
+do 
 
-#  Trim reads 
-#source ./trim_loop.sh
-
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
 
 #  Map reads to ref genome using BWA
 source ./mapping.sh
@@ -30,4 +26,5 @@ source ./mapping.sh
 # Calculate alignment stats for each individual and create table for my population
 source ./process_bam.sh
 
+done
 
