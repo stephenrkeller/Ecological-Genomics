@@ -1,16 +1,5 @@
 #!/bin/bash
 
-# Set your repo address here -- double check carefully!
-myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
-
-# Each student gets assigned a population to work with:
-mypop="AB_05"
-
-
-# Output dir to store mapping files (bam)
-output="/data/project_data/RS_ExomeSeq/mapping"
-
-
 ### Sorting SAM files and converting to BAM files
 for f in ${output}/BWA/${mypop}*.sam
 do
