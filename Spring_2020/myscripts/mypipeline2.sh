@@ -8,10 +8,10 @@ myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 cd ${myrepo}/myscripts
 
 # Output dir to store mapping files (bam)
-output="/data/project_data/RS_ExomeSeq/mapping"
+output="/users/s/r/srkeller/Ecological_Genomics/Spring_2020/myresults"
 
 # Each student gets assigned a population to work with:
-for mypop in HR MT RP WA 
+for mypop in GPA XCS XPK XSK 
 
 do 
 

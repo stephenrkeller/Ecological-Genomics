@@ -6,7 +6,7 @@
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 
 # Each student gets assigned a population to work with:
-mypop="AB"
+mypop="CR_"
 
 #Directory with demultiplexed fastq files
 input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
