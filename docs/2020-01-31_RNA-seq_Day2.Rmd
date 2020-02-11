@@ -1,39 +1,110 @@
 ---
-title: "P/BIO381 Tutorials: Working with RNA-seq data - Day 2"
-date: 'January 31, 2018'
+title: "P/BIO381 Tutorials: Mapping the ExomeSeq data - Day 2"
+date: 'February 05, 2020'
 output:
   prettydoc::html_pretty:
     theme: cayman
 fontsize: 18pt
 ---
 
-# Learning Objectives for 1/31/18
+# Learning Objectives for 02/05/20
 
-1. To reinforce our understanding of the general work flow or "pipeline" for processing and analyzing RNAseq data.
-2. To learn how data to download data from a website to a server (though you won't need to do it now).
-3. To start mapping (a.k.a. aligning) each set of cleaned reads to a reference transcriptome (Program: bwa; Input: .fastq; Output: .sam).
-4. To extract read count data from .sam files (i.e. the number of reads that map (align) to each "gene")
+1. To reinforce our understanding of the general work flow or "pipeline" for processing and analyzing ExomeSeq data.
+2. To start mapping (a.k.a. aligning) each set of cleaned reads to a reference genome, remove PCR duplicates, sort and index
+3. Calculate mapping statistics to assess quality of the result
 
-## (If you needed to) Download the reference transcriptome
+## (If you needed to) Download the reference genome
 
-The *Onthophagus* genome resources can be found [here](https://i5k.nal.usda.gov/Onthophagus_taurus).
+The *Picea abies* reference genome is based on Norway spruce (*P. abies*) and is available from [congenie.org](http://congenie.org).
+
 
 You don't actually need to do this because we already have the file in the directory below.  But for future reference `wget` is a useful command.
 
 ```bash
-cd /data/project_data/beetles/reference/
-wget https://i5k.nal.usda.gov/data/Arthropoda/onttau-%28Onthophagus_taurus%29/Current%20Genome%20Assembly/2.Official%20or%20Primary%20Gene%20Set/BCM_version_0.5.3/consensus_gene_set/OTAU.fna
+cd /data/project_data/RS_ExomeSeq/ReferenceGenomes/
+wget https://.fna
 ```
+
+The first step is to index the reference genome, but that only needs to be done once.  So we've done this step already, but here's the command.
+
+```
+$ bwa index /data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa
+```
+
+## Mapping cleaned and trimmed reads against the reference genome
+
+Now that we have cleaned and trimmed read pairs, we're ready to map them against the reference genome.  
+
+* We'll be using a reduced reference genome based on selecting only those scaffolds of the full genome reference that contain at least one bait.  We've placed it on our server here:
+
+`/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa`
+
+
+* We'll use the program [bwa](https://github.com/lh3/bwa), which is a very efficient and very well vetted read mapper.  Lots of others exist and can be useful to explore for future datasets.  We tried several, and for our exome data, bwa seems to be the best
+
+* We are going to write a bash script together that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  The resulting output will be a sam file alignment.  The basic bwa command we'll use is:
+
+```
+bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+
+```
+where 
+```
+-t 1 is the number of threads, or computer cpus to use (in this case, just 1)
+-M labels a read with a special flag if its mapping is split across >1 contig
+-a keeps alignments involving unpaired reads
+${ref} specifies the path and filename for the reference genome
+${forward} specifies the path and filename for the cleaned and trimmed R1 reads 
+${reverse} specifies the path and filename for the cleaned and trimmed R2 reads 
+>${output}/BWA/${name}.sam  directs the .sam file to be saved into a directory called BWA
+```
+
+Other bwa options detailed here:  [bwa manual page](http://bio-bwa.sourceforge.net/bwa.shtml)
+
+Let's write a bash script for just the read mapping to the reference genome.  We can test this out using one sample (individual) at a time, and then once the syntax is good and the bugs all worked out, we can scale this up to all the inds in our popuations.
+
+Part of our approach involves specifying the population of interest and the paths to the input and output directories.  We can do this by specifying variables in bash, like so:
+
+```
+
+
+
+```
+
+
+After mapping, our next steps (with basic syntax) are to:
+1. Convert our sam files to the more efficient binary version (bam) and sort them
++ `sambamba-0.7.1-linux-static view -S --format=bam file.sam -o file.bam`
+
+2. Get rid of any PCR duplicate sequences (why are these a problem?) and re-sort after removing dups
++ `sambamba-0.7.1-linux-static markdup -r -t 1 file.bam file.rmdup.bam`
++ `samtools sort file.rmdup.bam -o file.sorted.rmdup.bam`
+
+3. Get some stats on how well the mapping worked 
++ `samtools flagstat file.sorted.rmdup.bam | awk 'NR>=5&&NR<=13 {print $1}' | column -x` 
++ `samtools depth file.sorted.rmdup.bam | awk '{sum+=$3} END {print sum/NR}`
+
+Let's write these steps into separate bash files, combining (1) and (2) into one script called `process_bam.sh` and (3) into another script called `bam_stats.sh`
+
+Last step, we're going to put these scripts altogether into a "wrapper" that will exectue each of them one after the other, and work for us while we're off getting a coffee or sleeping.  :)  I'll show you how to code this together in class.
+
+
+To accomplish all of this, we'll use a combination of two new programs:  [samtools](https://github.com/samtools/samtools) and [sambamba](https://lomereiter.github.io/sambamba/).  Samtools was writtend by Heng Li, the same person who wrote bwa, and is a powerful tool for manipulating sam/bam files.  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed).  We'll use them both at different steps.
+
+
+Once your wrapper script is ready, you're going to want to start a `screen`.  The `screen` command initiates a new shell window that won't interupt or stop your work if you close your computer, log off the server, or leave the UVM network.  Anytime you're running long jobs, you definiteily want to use `screen`.
+
+Using it is easy.  Just type `screen` followed by <Enter>.  It will take you to a new empyt terminal. You can then start your wrapper bash script and see that it starts running.  Once everything looks good, you have to detach from the screen by typing Ctrl-A + Ctrl-D.  If you don't do this, you'll lose your work!
+
+When you're ready to check back on the progress of your program, you can recover your screen by typing `screen -r`.  That'll re-attach you back to your program!
+
+
 
 ## Map your reads to the reference transcriptome
 
 We'll use the program `bwa` to map our reads to the reference transcriptome.  The manual can be found [here](http://bio-bwa.sourceforge.net/bwa.shtml).
 
-The first step is to index the reference transcriptome, but that only needs to be done once.  So we've done this step already, but here's the command.
 
-```bash
-$ bwa index /data/project_data/beetles/reference/OTAU.fna
-```
 
 This fill generate 5 indexing files that all start with OTAU.fna in the ```/data/project_data/beetles/reference/``` directory.  You'll need this path to the reference index files in the mapping command below.
 

@@ -1,0 +1,190 @@
+---
+title: "P/BIO381 Tutorials: Mapping the ExomeSeq data - Day 2"
+date: 'February 05, 2020'
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+fontsize: 18pt
+---
+
+# Learning Objectives for 02/05/20
+
+1. Review our progress on read cleaning and visualizing QC
+2. Start mapping (a.k.a. aligning) each set of cleaned reads to a reference genome
+3. Visualize sequence alignment files
+4. Process our sam files by 
+  + converting to binary (bam) format and sorting by coordinates
+  + removing PCR duplicates
+  + indexing for fast future lookup
+5. Calculate mapping statistics to assess quality of the result
+6. Learn how to put separate bash scripts into a "wrapper" that runs them all
+ 
+
+## Mapping cleaned and trimmed reads against the reference genome
+
+Now that we have cleaned and trimmed read pairs, we're ready to map them against the reference genome.  
+
+The first step of read mapping is downloading the reference genome, freely available from [congenie.org](http://congenie.org):  ![](http://congenie.org/sites/all/themes/simply_modern/images/cnlogo4.png)
+
+The *Picea abies* reference genome is based on Norway spruce (*P. abies*) and [published by Nystedt et al. (2013)](https://www.nature.com/articles/nature12211).  
+
+![](https://media.springernature.com/lw750/springer-static/image/art%3A10.1038%2Fnature12211/MediaObjects/41586_2013_Article_BFnature12211_Figa_HTML.jpg)
+
+
+You don't actually need to download the genome because we already have the file in the directory below.  But for future reference `wget` is a useful command to ownload files from the web.
+
+```
+cd /data/project_data/RS_ExomeSeq/ReferenceGenomes/
+wget "http://plantgenie.org/Picea_abies/v1.0/FASTA/GenomeAssemblies/Pabies1.0-genome.fa.gz"
+```
+
+Rather than trying to map to the entire 19.6 Gbp reference (yikes!), we first subsetted the *P. abies* reference to include **just the contigs that contain one or more probes** from our exon capture experiment. For this, we did a BLAST search of each probe against the *P. abies* reference genome, and then retained all scaffolds that had a best hit.
+
+* This reduced reference contains:
+  + 668,091,227 bp (~668 Mbp) in 33,679 contigs
+  + The mean (median) contig size is 10.5 (12.9) kbp
+  + The N50 of the reduced reference is 101,375 bp
+
+* The indexed reduced reference genome to use for your mapping is on our server here:
+
+`/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa`
+
+
+### To help make our scripting approach efficient, we're going to write several short scripts, optimizing each one at a time, then put them together at the end
+
+* First, we want to specify the population of interest and the paths to the input and output directories.  We can do this by defining variables in bash, like so:
+
++ Set your repo address here -- double check yours carefully!
++ `myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"`
+
++ Each student gets assigned a population to work with:
++ `mypop="YOURPOP"`"
+
++ Directory with your pop-specific demultiplexed fastq files
++ `input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"`
+
+
++ Output dir to store mapping files (bam)
++ `output="/data/project_data/RS_ExomeSeq/mapping"`
+
+
+* For mapping, we'll use the program [bwa](https://github.com/lh3/bwa), which is a very efficient and very well vetted read mapper.  Lots of others exist and can be useful to explore for future datasets.  We tried several, and for our exome data, bwa seems to be the best
+
+* Let's write a bash script called `mapping.sh` that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  We can test this out using one sample (individual) at a time, and then once the syntax is good and the bugs all worked out, we can scale this up to all the inds in our popuations. The basic bwa command we'll use is below.  Think about how we should write this into a loop to call all the fastq files for our population of interest...(hint, look back at the `trim_loop.sh` script)
+
+```
+bwa mem -t 1 -M ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+
+```
+where 
+
+```
+-t 1 is the number of threads, or computer cpus to use (in this case, just 1)
+-M labels a read with a special flag if its mapping is split across >1 contig
+-${ref} specifies the path and filename for the reference genome
+${forward} specifies the path and filename for the cleaned and trimmed R1 reads 
+${reverse} specifies the path and filename for the cleaned and trimmed R2 reads 
+>${output}/BWA/${name}.sam  directs the .sam file to be saved into a directory called BWA
+```
+
+* Other bwa options detailed here:  [bwa manual page](http://bio-bwa.sourceforge.net/bwa.shtml)
+
+#### While that's running, let's take a look at a Sequence AlignMent (SAM) file already available in `/data/project_data/RS_ExomeSeq/mapping/BWA/`  
+
+* First, try looking at a SAM file using `head` and `tail`.
+
+```
+tail -n 100 FILENAME.sam
+```
+
+A SAM file is a tab delimited text file that stores information about the alignment of reads in a FASTQ file to a reference genome or transcriptome. For each read in a FASTQ file, there’s a line in the SAM file that includes
+
+- the read, aka. query, name,
+- a FLAG (number with information about mapping success and orientation and whether the read is the left or right read),
+- the reference sequence name to which the read mapped
+- the leftmost position in the reference where the read mapped
+- the mapping quality (Phred-scaled)
+- a CIGAR string that gives alignment information (how many bases Match (M), where there’s an Insertion (I) or Deletion (D))
+- an ‘=’, mate position, inferred insert size (columns 7,8,9),
+- the query sequence and Phred-scaled quality from the FASTQ file (columns 10 and 11),
+- then Lots of good information in TAGS at the end, if the read mapped, including whether it is a unique read (XT:A:U), the number of best hits (X0:i:1), the number of suboptimal hits (X1:i:0).
+
+The left (R1) and right (R2) reads alternate through the file. SAM files usually have a header section with general information where each line starts with the ‘@’ symbol. SAM and BAM files contain the same information; SAM is human readable and BAM is in binary code and therefore has a smaller file size.
+
+Find the official Sequence AlignMent file documentation can be found [here](https://en.wikipedia.org/wiki/SAM_(file_format)) or [more officially](https://samtools.github.io/hts-specs/SAMtags.pdf).
+
+- [Some useful FLAGs to know](http://seqanswers.com/forums/showthread.php?t=17314) - for example what do the numbers in the second column of data mean? 
+
+- [Here’s a SAM FLAG decoder](https://broadinstitute.github.io/picard/explain-flags.html) by the Broad Institute.
+
+#### How can we get a summary of how well our reads mapped to the reference? 
+
+* We can use the program [samtools](https://github.com/samtools/samtools) Written by Heng Li, the same person who wrote bwa. It is a powerful tool for manipulating sam/bam files.  
+
++ The command `flagstats` gets us some basic info on how well the mapping worked:
+
++ `samtools flagstat FILENAME.sam` 
+
+
+#### Another option with LOTS of info is the samtools `stats` command
+
+* Let’s see how many of our reads map uniquely.  Use the -c option of `grep` to count the # of matches
+
++ `samtools stats FILENAME.sam` 
+
+...this can be combined with a grep statement to get just those lines beginning with SN:
+
++ `samtools stats FILENAME.sam | grep ^SN`
+
+#### After mapping, our next steps are to:
+
+1. convert sam>bam, 
+2. mark and remove the PCR duplicates
+3. sort the bam alignment file
+4. index the sorted bam file for fast lookup
+
+To accomplish all of this, we'll use samtools as well as a companion program:
+
++ [sambamba](https://lomereiter.github.io/sambamba/).  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed). 
+
+The steps (with basic syntax) are to:
+
+1. Convert our sam files to the more efficient binary version (bam) and sort them
++ `sambamba-0.7.1-linux-static view -S --format=bam file.sam -o file.bam`
++ `samtools sort file.bam -o file.sorted.bam`
+
+2. Get rid of any PCR duplicate sequences (why are these a problem?)
++ `sambamba-0.7.1-linux-static markdup -r -t 1 file.bam file.sorted.rmdup.bam`
+
+
+* Let's write these steps into a separate bash file called `process_bam.sh` 
+
+#### Next, we'll write a final bash script called `bam_stats.sh`.  
+
+* This will be similar to what we used on the .sam file, but now after removing the PCR duplicates.
+
+* We'll also use the `awk` tool to help format the output.  
+
+* We'll use the samtools `depth` command to get perhaps the most important statistic in read mapping:  the depth of coverage, or how many reads cover each mapped position, on average:
+
++ `samtools flagstat file.sorted.rmdup.bam | awk 'NR>=6&&NR<=13 {print $1}' | column -x` 
++ `samtools depth file.sorted.rmdup.bam | awk '{sum+=$3} END {print sum/NR}`
+
+#### Last step, we're going to put all of these scripts altogether into a "wrapper" that will execute each of them one after the other, and work for us while we're off getting a coffee or sleeping.  :)  
+
+* Scripts to include:
++ mapping.sh
++ process_bam.sh
++ bam_stats.sh
+
+Let's code this together in class and name the wrapper scripts `mypipeline.sh`
+
+Once your wrapper script is ready, you're going to want to start a `screen`.  The `screen` command initiates a new shell window that won't interupt or stop your work if you close your computer, log off the server, or leave the UVM network.  Anytime you're running long jobs, you definiteily want to use `screen`.
+
+Using it is easy.  Just type `screen` followed by <Enter>.  It will take you to a new empyt terminal. You can then start your wrapper bash script and see that it starts running.  Once everything looks good, you have to detach from the screen by typing Ctrl-A + Ctrl-D.  If you don't do this, you'll lose your work!
+
+When you're ready to check back on the progress of your program, you can recover your screen by typing `screen -r`.  That'll re-attach you back to your program!
+
+
+
+

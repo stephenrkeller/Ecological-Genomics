@@ -1,35 +1,53 @@
 ---
-title: "P/BIO381 Tutorials: Working with RNA-seq data"
-date: 'January 29, 2018'
+title: "P/BIO381 Tutorials: Population Genomics Day 1"
+date: 'January 29, 2020'
 output:
   prettydoc::html_pretty:
     theme: cayman
 fontsize: 18pt
 ---
 
-# Learning Objectives for 1/29/18
+# Learning Objectives for 1/29/20
 
-1. To understand the Onthophagus taurus beetle biology, experimental design, and data set.
-2. To understand the general work flow or "pipeline" for processing and analyzing RNAseq data.
-3. To learn how to make/write a bash script and how write a script to process files in batches (*.sh files and #! should mean something to you by the end of today).
-4. To visualize and interpret Illumina data quality (what is a .fastq file and what are Phred scores?).
-5. To add to your growing list of bioinformatics tricks (take notes!).
-
-
-
-## 1. The bull headed beetle, *Onthophagus taurus*
-
-Native to the mediterranean, this dung beetle was deliberately introduced to Australia in the late 1960s with a massive, government-led effort to help reduce fly pests and disease that were plaguing livestock.  In the early 1970s, the beetles were "accidentally" introduced to the eastern United States from an unknown origin.  
-
-*The experimental design:*
-
-- Three populations reared in a common garden lab conditions for more than two generations: from the native range, Italy (IT), from Western Australia (WA), from North Carolina (NC)
-- Four developmental stages: late third larval instart (L3L), pre-pupae day 1 (PP1), pupae day 1 (PD1), and adults four days after ecolsion (AD4)
-- Both sexes; three individuals per sex
-- 3 pops * 4 developmental stages * 2 sexes * 3 individuals = 72 samples
-- Sequenced on about 7 lanes of Illumina HiSeq 2500
+1. To get background on the ecology of Red spruce (*Picea rubens*), and the experimental design of the exome capture data
+2. To understand the general work flow or "pipeline" for processing and analyzing the exome capture sequence data
+3. To visualize and interpret Illumina data quality (what is a fastq file; what are Phred scores?).
+4. To learn how to make/write a bash script, and how to use bash commands to process files in batches 
+5. To trim the reads based on base quality scores
+6. To start mapping (a.k.a. aligning) each set of cleaned reads to a reference genome
 
 
+## 1. Red spruce, *Picea rubens* 
+<img src="https://static.inaturalist.org/photos/5362103/large.jpg?1544110582" width="550" height="350">
+<img src="https://www.researchgate.net/profile/Adam_Rollins/publication/33756615/figure/fig1/AS:309876237586432@1450891660815/The-range-of-red-spruce-USGS-1999_W640.jpg" width="270" height="350">
+
+Red spruce is a coniferous tree that plays a prominent role in montane communities throughout the Appalachians. It thrives in the cool, moist climates of the high elevation mountains of the Apppalachians and northward along the coastal areas of Atlantic Canada. 
+
+One region where populations are particular vulnerable to climate change is in the low-latitude trailing edge of the range, from Maryland to Tennessee, where populations are highly fragmented and isolated on mountaintops. These “island” populations are remnants of spruce forests that covered the southern U.S. glaciers extended as far south as Long Island, NY. As the climate warmed at the end of the Pleistocene (~20K years ago), red spruce retreated upward in elevation to these mountaintop refugia, where they are now highlty isolated from other such stands and from the core of the range further north. 
+
+A goal of our study is to better understand the genetic resource represented by these fragemented edge populations, and to use that information to help inform conservation biologists working to restore red spruce in this region.  A close partner in this effort is the [Nature Conservancy](https://www.nature.org/en-us/about-us/where-we-work/united-states/west-virginia/stories-in-west-virginia/sprucing-things-up-a-bit/) and the Central Appalachian Spruce Restoration Initiative ([CASRI](http://restoreredspruce.org)) -- a multi-partner group dedicated to restoring and enhancing red spruce populations to promote their resilience under climate change.
+
+![](http://restoreredspruce.org/wp/wp-content/uploads/2019/09/cropped-New-logo-CASRI-header-1.jpg)
+
+
+Some videos of red spruce restoration in MD and WV:
+
+* [Cranesville Swamp, MD](https://youtu.be/jcY7Q6x8Jao)
+
+* [Allegheny Mountains, WV](https://youtu.be/FYKbjXB4cHs)
+
+With funding from the National Science Foundation, the Keller Lab is studying the genetic basis of climate adaptation across the distribution of *P. rubens*.  Our main goals are to **(1) characterize the genetic diversity and population structure across the range, (2) identify regions of the genome that show evidence of positive selection in response to climate gradients, and (3) to map the genetic basis of climate adaptive phenotypes.**  We hope to use this information to inform areas of the range most likely to experience climate maladaptation, and to help guide mitigation strategies.
+
+*Experimental Design*
+
+- In 2017, we collected seeds and needle tissue from 340 mother trees at 65 populations spread throughout the range. We extracted whole genomic DNA from needles to use for exome capture sequencing.
+- Sample size in the edge region = 110 mother trees from 23 populations.  
+- Exome capture was designed based on transcriptomes from multiple tissues and developmental stages in the related species, white spruce (*P. glauca*).  
+- Bait design used 2 transcriptomes previously assembled by [Rigault et al. (2011)](http://www.plantphysiol.org/content/157/1/14.full) and [Yeaman et al. (2014)](https://nph.onlinelibrary.wiley.com/doi/full/10.1111/nph.12819). 
+- A total of 80,000 120bp probes were designed, including 75,732 probes within or overlapping exomic regions, and an additional 4,268 probes in intergenic regions. 
+- Each probe was required to represent a single blast hit to the *P. glauca* reference genome of at least 90bp long and 85% identity, covering **38,570 unigenes**.  
+- Libraries were made by random mechanical shearing of DNA (250 ng -1ug) to an average size of 400 bp followed by end-repair reaction, ligation of an adenine residue to the 3’-end of the blunt-end fragments to allow the ligation of barcoded adapters, and PCR-amplification of the library.  SureSelect probes (Agilent Technologies: Santa Clara, CA) were used for solution-based targeted enrichment of pools of 16 libraries, following the SureSelectxt Target Enrichment System for Illumina Paired-End Multiplexed Sequencing Library protocol.  
+- Libraries were sequenced on a single run of a Illumina HiSeq X to generate paired-end 150-bp reads.
 
 ## 2. The "pipeline"
 
@@ -41,52 +59,42 @@ Native to the mediterranean, this dung beetle was deliberately introduced to Aus
 
 + Visualize the quality of cleaned data (Program: FastQC)
 
-2. Download reference transcriptome assembly
+2. Calculate #'s of cleaned, high quality reads going into mapping
 
-   * *Note:* If you're working with an organism that does not have a reference assembly, this is the point when you use your cleaned reads to make a reference assembly (e.g. program: Trinity), assess it's quality (Programs: BUSCO, blastx to various databases)
+3. Map (a.k.a. Align) cleaned reads from each sample to the reference assembly to generate **s**equence **a**lign**m**ent files (Program: bwa, Input: *.fastq, Output: *.sam).  
 
-3. Map (a.k.a. Align) cleaned reads from each sample to the reference assembly to generate **s**equence **a**lign**m**ent files (Program: bwa, Input: *.fastq, Output: *.sam)
+4. Remove PCR duplicates identified during mapping, and calculate alignment statistics (% of reads mapping succesully, mapping quality scores, average depth of coverage per individual)
 
-4. Extract read count data from .sam files (i.e. the number of reads that map (align) to each "gene")
-
-5. Assemble a data matrix of counts for each gene for each sample
-
-6. Analyze count data to test for differences in gene expression
+We'll then use the results of our mapping next week to start estimating diversity and population structure.
 
 
+## 3.-5. Visualize, Clean, and Visualize again
 
-## 3. Visualize, Clean, and Visualize again
-
-Let's begin to work with our RNAseq data!  The first step is to take a look at the quality of our data coming off the sequencer and see if we notice any problems.  
+Whenever you get a new batch of NGS data, the first step is to look at the data quality of coming off the sequencer and see if we notice any problems with base quality, sequence length, PCR duplicates, or adapter contamination.  
 
 You'll each be in charge of cleaning and visualizing the left (R1) and right (R2) files from a single sample.
 
-Your file assignment for today:
+We're going to assign each student to analyze all the sequence files from one population.  (We'll do this in class)
 
-| Student | Files      |
-| ------- | ---------- |
-| Ethan   | WA_PP1_F1* |
-| Jamie   | WA_PP1_F2* |
-| Lucy    | WA_PP1_F3* |
-| Morgan  | WA_PP1_M1* |
-| Paul    | WA_PP1_M2* |
-| Suraj   | WA_PP1_M3* |
+### What is a .fastq file?
 
-You can find these in the directory `/data/project_data/beetles/rawdata/`
+[A fastq file is the standard sequence data format for NGS](https://en.wikipedia.org/wiki/FASTQ_format).  It contains the sequence of the read itself, the corresponding quality scores for each base, and some meta-data about the read.  
 
-### Peak: What is a .fastq file?
+The files are big (typically many Gb compressed), so we can't open them completely.  Instead, we can peek inside the file using `head`.  But size these files are compressed (note the .gz ending in the filenames), and we want them to stay compressed while we peek.  Bash has a solution to that called `zcat`.  This lets us look at the .gz file without uncompressing it all the way.  
 
-Let's take a peak into a file and learn something about what a .fastq file is:
+The fastq files are in this path:  `/data/project_data/RS_ExomeSeq/fastq/edge_fastq`
 
-```bash
-$ zcat WA_PP1_F1_AGTCAA_L003_R1_001.fastq.gz | head -n4
-@CCRI0219:155:C2LNBACXX:3:1101:1499:1976 1:N:0:AGTCAA
-CGGGATCGTAAGGAGCTAATTCTTTAGCACGGGATGTTTTTACTAAATCAACCCATTCCGGTACTTTTAGTTTTCCTGATTTTTTAAGAAATTGGGCGAA
+```
+cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq
+zcat AB_05_R1_fastq.gz | head -n 4
+
+@GWNJ-0842:368:GW1809211440:2:1101:17168:1907 1:N:0:NGAAGAGA+NTTCGCCT
+GATGGGATTAGAGCCCCTGAAGGCTGATAGAACTTGAGTTTCACAGGCTCATTGCATTGAAGTGGCATTTGTGTGAATGCAGAGGAGGTACATAGGTCCTCGAGAATAAAAGAGATGTTGCTCCTCACCAAAATCAGTACAGATTATTTT
 +
-@@?DDDDDFFH??FHBHGI4CB?FHGH>@<EGG@DEHHIGIEFHE>DH9CC3B;;7@CCEBHEDEDEDE@ACAC;>@CCCCCCFBBA>@C9A:>@?B><@
+A<A-F<AFJFJFJA7FJJJJFFJJJJJJ<AJ-FJJ7-A-FJAJJ-JJJA7A7AFJ<FF--<FF7-AJJFJFJA-<A-FAJ<AJJ<JJF--<A-7F-777-FA77---7AJ-JF-FJF-A--AJF-7FJFF77F-A--7<-F--77<JFF<
 ```
 
-*Note:* `zcat` lets us open a .gz (gzipped) file like `cat`; we then "pipe" `|` this output from `zcat` to the `head` command and print just the top 4 lines `-n4`
+*Note:* `zcat` lets us open a .gz (gzipped) file; we then "pipe" `|` this output from `zcat` to the `head` command and print just the top 4 lines `-n4`
 
 The fastq file format** has 4 lines for each read: 
 
@@ -112,7 +120,7 @@ So:
 | 30                  | 1 in 1000                          | 99.9%              |
 | 40                  | 1 in 10,000                        | 99.99%             |
 
-***The Phred Q score is translated to ASCII characters so that a two digit number can be represented by a single character.*** So clever! 
+*The Phred Q score is translated to ASCII characters so that a two digit number can be represented by a single character.*
 
 ```
  Quality encoding: !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHI
@@ -124,124 +132,208 @@ So:
 
 ### Visualize using FastQC
 
-How can we look at the quality more systematically for all reads in the file?  We can use [the program FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (also already installed in our `/data/popgen/` directory). FastQC looks at the quality collectively across all reads in a sample.
+We're going to use [the program FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (already installed on our server).  FastQC looks at the quality collectively across all reads in a sample.
 
-Clean your file using the following command:
+First, let's make a new dir within `myresults` to hold the outputs
 
-```
-fastqc FILENAME.fastq.gz
-```
+`mkdir ~/<myrepo>/myresults/fastqc`
 
-This will generate an .html output file in the directory in which you run your command.  You could run this from a directory in your home directory; to do that you would need to provide the full path to the input file. 
-
-Move your .html file you just generated to your computer using the `scp ` command from your computer (hint: open another terminal or putty window)
+Then, the basic FastQC command is like this:
 
 ```
-scp NETID@pbio381.uvm.edu:/PATHTODIRECTORY/YOURFILE_fastqc.html .
+fastqc FILENAME.fastq.gz -o outputdirectory/
 ```
 
-The dot means "to the present directory" or you can direct it somewhere else.
+This will generate an .html output file for each input file you've run.  
 
-Alternatively, you can use a file tranfer program like fetch, etc.
+But, we want to be clever and process multiple files (i.e., ALL files from our population) without having to manually submit each one.  We can do this by writing a bash script that contains a loop.
+
+The basic syntax of a bash loops is like this:
+```
+for file in myfiles
+do
+  command 1 -options ${file}
+  command 2 -options ${file}
+done
+```
+
+Note the use of variable assignment using ${}.  We define the word `file` in the for loop as the variable of interest, and then call the iterations of it using ${file}.  For example, we could use the wildcard character (*) in a loop to call all files that include the population code "AB" and then pass those filenames in a loop to fastqc.  Something like:
+
+```
+for file in AB*fastq.gz
+
+do
+
+ fastqc ${file} -o ~/<myrepo>/myresults/fastqc
+
+done
+```
+
+Let's write the above into a script using the Vim text editor at the command line. Type `vim` to get into the editor, then type "i" to enter INSERT mode.  You can then type your script (remember to make necessary changes to the population code and output path).  Lastly, to save the file and quit Vim, hit the ESCAPE key to get out of INSERT mode, followed by `:wq fastqc.sh`
+
+Back at the command line, you should be able to `ll` and see your new script!  
+
+#### You may find that you need to change the permission on your script to make it executable. Do this using chmod u+x, which changes the permissions to give the user (you) permission to execute (x).  Then give it a run!
+
+```
+chmod u+x fastqc.sh    # makes the script "executable" by the "user"
+./fastqc.sh  		    # executes the script
+```
+
+It'll take just a couple of minutes per fastq file.  Once you've got results, let's look at them by pushing your html files up to your Github.  Remember, 
+
+```
+git pull
+git add --all .
+git commit -m "note"
+git push
+```
+Once synced to Github, use Github desktop to pull them down to your laptop where you can open them with a browser.
 
 *How does the quality look?*
 
+
 ### Clean using Trimmomatic
 
-[Here's a link to the Trimmomatic program](http://www.usadellab.org/cms/index.php?page=trimmomatic) that we'll use to clean the reads for each file. The program is already installed in our `/data/popgen/` directory.
+[We'll use the Trimmomatic program](http://www.usadellab.org/cms/index.php?page=trimmomatic) to clean the reads for each file. The program is already installed on our server.
 
 We've provided an example script in the `/data/scripts/` directory this time because the program is a java based program and thus a bit more particular in its call.  
 
-1. Make a directory in your home directory called "scripts" and another called "cleanreads"
-2. Copy the bash script over to your ~/scripts directory
-3. Open and edit bash script using the program vim
+1. Copy the bash script over to your ~/myrepo/myscripts directory
+2. Open and edit the bash script using the program vim.  
+3. Edit the file so that you're trimming the fastq files for the population assigned to you
 4. Change the permissions on your script to make it executable, then run it!  (examples below)
 
-```bash
-cp /data/scripts/trim_example.sh ~/scripts/ # copies the script to your home scripts dir
-vim trim_example.sh						  # open the script with vim to edit
+```
+cp /data/scripts/trim_loop.sh  ~/myrepo/myscripts/ # copies the script to your home scripts dir
+vim trim_loop.sh	# open the script with vim to edit
+```
+This time we use the variable coding to call the name of the R1 read pair, define the name for the second read in the pair (R2), and create a basename that only contains the "pop_ind" part of the name, i.e. AB_05
+```
+	R2=${R1/_R1_fastq.gz/_R2_fastq.gz}   # defines the name for the second read in the pair (R2) based on knowing the R1 name (the file names are identifcal except for the R1 vs. R2 designation)
+	f=${R1/_R1_fastq.gz/}   # creates a new variable from R1 that has the "_R1_fastq.gz" stripped off
+	name=`basename ${f}`   # calls the handy "basename" function to define a new variable containing only the very last part of the filename while stripping off all the path information.  This gets us the "AB_05" bit we want.
 ```
 
-```bash
-#!/bin/bash
-      java -classpath /data/popgen/Trimmomatic-0.33/trimmomatic-0.33.jar org.usadellab.trimmomatic.TrimmomaticPE \  
-                -threads 1 \ 
-                -phred33 \
-                 /data/project_data/beetles/rawdata/WA_PP1_YOURSAMPLE_R1.fastq.gz \
-                 /data/project_data/beetles/rawdata/WA_PP1_YOURSAMPLE_R2.fastq.gz \
-                 ~/cleanreads/"YOURSAMPLE_R1_clean_paired.fa" \
-                 ~/cleanreads/"YOURSAMPLE_R1_clean_unpaired.fa" \
-                 ~/cleanreads/"YOURSAMPLE_R2_clean_paired.fa" \
-                 ~/cleanreads/"YOURSAMPLE_R2_clean_unpaired.fa" \
-                 ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 \
-                 LEADING:28 \
-             	TRAILING:28 \
-             	SLIDINGWINDOW:6:28 \
-             	HEADCROP:12 \
-             	MINLEN:35 \
+Here's how it should look (replace AB with your population name):
+
+```
+#!/bin/bash   
+ 
+cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
+
+for R1 in AB*R1_fastq.gz  
+
+do 
+ 
+	R2=${R1/_R1_fastq.gz/_R2_fastq.gz}
+	f=${R1/_R1_fastq.gz/}
+	name=`basename ${f}`
+
+	java -classpath /data/popgen/Trimmomatic-0.33/trimmomatic-0.33.jar org.usadellab.trimmomatic.TrimmomaticPE \
+        -threads 1 \
+        -phred33 \
+         "$R1" \
+         "$R2" \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${name}_R1.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/${name}_R1.cl.un.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${name}_R2.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/${name}_R2.cl.un.fq \
+        ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 \
+        LEADING:20 \
+        TRAILING:20 \
+        SLIDINGWINDOW:6:20 \
+        MINLEN:35 
+ 
+done 
+
 ```
 
 Trimmomatic performs the cleaning steps in the order they are presented. It's recommended to clip adapter early in the process and clean for length at the end.
 
-Here's the general format of the command:
-
-```bash
-java -jar <path to trimmomatic.jar> PE 
-	[-threads <threads] 
-	[-phred33 | -phred64] 
-	<input 1> 
-	<input 2> 
-	<paired output 1> 
-	<unpaired output 1> 
-	<paired output 2> 
-	<unpaired output 2> 
-	<step 1> 
-	...
-```
-
 The steps and options are [from the Trimmomatic website](http://www.usadellab.org/cms/index.php?page=trimmomatic):
-
-- ILLUMINACLIP:<fastaWithAdaptersEtc>:<seed mismatches>:<palindrome clip threshold>:<simple clip threshold>
-- SLIDINGWINDOW:<windowSize>:<requiredQuality>
-  - windowSize: specifies the number of bases to average across
-  - requiredQuality: specifies the average quality required.
-- LEADING:<quality>
-  - quality: Specifies the minimum quality required to keep a base.
-- TRAILING:<quality>
-  - quality: Specifies the minimum quality required to keep a base.
-- CROP:<length>
-  - length: The number of bases to keep, from the start of the read.
-- HEADCROP:<length>
-  - length: The number of bases to remove from the start of the read.
-- MINLEN:<length>
-  - length: Specifies the minimum length of reads to be kept.
 
 ```
 ILLUMINACLIP: Cut adapter and other illumina-specific sequences from the read.
-SLIDINGWINDOW: Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold.
 LEADING: Cut bases off the start of a read, if below a threshold quality
 TRAILING: Cut bases off the end of a read, if below a threshold quality
-CROP: Cut the read to a specified length
-HEADCROP: Cut the specified number of bases from the start of the read
+SLIDINGWINDOW: Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold.
 MINLEN: Drop the read if it is below a specified length
-```
-
-#### Now run your script!
-
-```bash
-chmod u+x trim_example.sh    # makes the script "executable" by the "user"
-./trim_example.sh  		    # executes the script, or bash trim_example.sh
 ```
 
 ### Visualize again using FastQC
 
 Check the quality of one of your cleaned files using fastqc again.
 
-```bash
-				# You fill in the blank!
+```
+				# You fill in the blank!  Don't forget to change your input path to the pairedcleaned files!
 ```
 
-Should we play with when to do the HEADCROP step?
+## 6. Mapping cleaned and trimmed reads against the reference genome
+
+Now that we have cleaned and trimmed read pairs, we're ready to map them against the reference genome.  
+
+* We'll be using a reduced reference genome based on selecting only those scaffolds of the full genome reference that contain at least one bait.  We've placed it on our server here:
+
+`/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa`
+
+* The reference genome is based on Norway spruce (*P. abies*) and is available from [congenie.org](http://congenie.org).
+
+* We'll use the program [bwa](https://github.com/lh3/bwa), which is a very efficient and very well vetted read mapper.  Lots of others exist and can be useful to explore for future datasets.  We tried several, and for our exome data, bwa seems to be the best
+
+* We are going to write a bash script together that calls the R1 and R2 reads for each individual in our population, and uses the bwa-mem algorithm to map reads to the reference genome.  The resulting output will be a sam file alignment.  The basic bwa command we'll use is:
+
+```
+bwa mem -t 1 -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+
+```
+where 
+```
+-t 1 is the number of threads, or computer cpus to use (in this case, just 1)
+-M labels a read with a special flag if its mapping is split across >1 contig
+-a keeps alignments involving unpaired reads
+${ref} specifies the path and filename for the reference genome
+${forward} specifies the path and filename for the cleaned and trimmed R1 reads 
+${reverse} specifies the path and filename for the cleaned and trimmed R2 reads 
+>${output}/BWA/${name}.sam  directs the .sam file to be saved into a directory called BWA
+```
+
+Other bwa options detailed here:  [bwa manual page](http://bio-bwa.sourceforge.net/bwa.shtml)
+
+Our last steps (with basic syntax) are to:
+1. Convert our sam files to the more efficient binary version (bam) and sort them
++ `sambamba-0.7.1-linux-static view -S --format=bam file.sam -o file.bam`
+
+2. Get rid of any PCR duplicate sequences (why are these a problem?) and re-sort after removing dups
++ `sambamba-0.7.1-linux-static markdup -r -t 1 file.bam file.rmdup.bam`
++ `samtools sort file.rmdup.bam -o file.sorted.rmdup.bam`
+
+3. Get some stats on how well the mapping worked 
++ `samtools flagstat file.sorted.rmdup.bam | awk 'NR>=5&&NR<=13 {print $1}' | column -x` 
++ `samtools depth file.sorted.rmdup.bam | awk '{sum+=$3} END {print sum/NR}`
+
+
+
+For this, we'll use a combination of two new programs:  [samtools](https://github.com/samtools/samtools) and [sambamba](https://lomereiter.github.io/sambamba/).  Samtools was writtend by Heng Li, the same person who wrote bwa, and is a powerful tool for manipulating sam/bam files.  Sambamba is derived from samtools, and has been re-coded to increase efficiency (speed).  We'll use them both at different steps.
+
+I've put a bash script with the commands to run steps 1-3 above.  It's located here:
+
+`/data/scripts/process_bam.sh`
+
+Make a copy of this over to your home directory and use `vim` to edit the paths and population.  Then when you're ready to save and quit vim, type `:wq`
+
+Last step, we're going to put these scripts altogether into a "wrapper" that will exectue each of them one after the other, and work for us while we're off getting a coffee or sleeping.  :)  I'll show you how to code this together in class.
+
+Once your wrapper script is ready, you're going to want to start a `screen`.  The `screen` command initiates a new shell window that won't interupt or stop your work if you close your computer, log off the server, or leave the UVM network.  Anytime you're running long jobs, you definiteily want to use `screen`.
+
+Using it is easy.  Just type `screen` followed by <Enter>.  It will take you to a new empyt terminal. You can then start your wrapper bash script and see that it starts running.  Once everything looks good, you have to detach from the screen by typing Ctrl-A + Ctrl-D.  If you don't do this, you'll lose your work!
+
+When you're ready to check back on the progress of your program, you can recover your screen by typing `screen -r`.  That'll re-attach you back to your program!
+
+
+
+
+
 
 
 

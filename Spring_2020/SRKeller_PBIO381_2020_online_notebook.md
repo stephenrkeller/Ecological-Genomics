@@ -27,8 +27,8 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 ### Table of contents for 60 entries (Format is *Page: Date(with year-month-day). Title*)        
 * [Page 1: 2020-01-22](#id-section1). Intro to Github, Markdown, and UNIX command-line
-* [Page 2:](#id-section2).
-* [Page 3:](#id-section3).
+* [Page 2: 2020-01-29](#id-section2). FastQC, read trimming, and mapping to reference genome
+* [Page 3: 2020-02-04](#id-section3). Reduced reference assembly stats; mapping exome capture reads; bam processing
 * [Page 4:](#id-section4).
 * [Page 5:](#id-section5).
 * [Page 6:](#id-section6).
@@ -89,6 +89,7 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 ------
 <div id='id-section1'/>
+
 ### Page 1: 2018-01-24. Notes on using Github, markdown, and the UNIX command-line
 
 * Ask Lauren to give a brief intro on using git to create a repo and document your work in a lab notebook; push to origin on github
@@ -109,21 +110,267 @@ Science should be reproducible and one of the best ways to achieve this is by lo
 
 * On next Wednesday, pick up with using vim to edit files (using .bashrc as example) and then working with fastq files
 
-* Plan should be to walk-through fastqs, assign population samples to students, have them run fastqc, 
-	have them design a trimomatic script to clean the reads up, then set up a bash script in `screen` to map reads with bwa and 
-        calculate genotype likelihoods 
-
-
-
-
+* Plan should be to walk-through fastqs, assign population samples to students, have them run fastqc, have them design a trimomatic script to clean the reads up, then set up a bash script in `screen` to map reads with bwa and calculate genotype likelihoods 
 
 
 ------
 <div id='id-section2'/>
 ### Page 2: 2018-01-29 
+
+Here's the code we used to run FastQC:
+
+```
+#!/bin/bash 
+
+# Pipeline to assess sequencing quality of RS exome sequences
+
+# Set your repo address here -- double check carefully!
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+# Make a new folder within 'myresults' to hold your fastqc outputs
+mkdir ${myrepo}/myresults/fastqc
+
+# Each student gets assigned a population to work with:
+mypop="AB" 
+
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/${mypop}"
+
+#  Run fastqc program in a loop, processing all files that contain your population code
+for file in ${input}*fastq.gz
+
+do
+
+ fastqc ${file} -o ${myrepo}/myresults/fastqc
+ echo -e "\n\n   Results saved to ${myrepo}/myresults/fastqc...on to the next one!   \n\n"
+
+done
+```
+
+
+Example output from FastQC -- copied to my 'docs' folder on GitHub for webpage display:
+
+* [AB_05_R1_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R1_fastq_fastqc.html)
+* [AB_05_R2_fastq](https://stephenrkeller.github.io/Ecological_Genomics/AB_05_R2_fastq_fastqc.html)
+
+We then moved onto read trimming using Trimmomatic:
+
+```
+#!/bin/bash   
+ 
+cd /data/project_data/RS_ExomeSeq/fastq/edge_fastq  
+ 
+mkdir pairedcleanreads
+mkdir unpairedcleanreads
+
+for R1 in AB*R1_fastq.gz  
+
+do 
+ 
+ R2=${R1/_R1_fastq.gz/_R2_fastq.gz}
+ short=`echo $R1 | cut -c1-5`
+ echo $short 
+java -classpath /data/popgen/Trimmomatic-0.33/trimmomatic-0.33.jar org.usadellab.trimmomatic.TrimmomaticPE \
+        -threads 10 \
+        -phred33 \
+         "$R1" \
+         "$R2" \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R1.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R1.cl.un.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/"$short"_R2.cl.pd.fq \
+         /data/project_data/RS_ExomeSeq/fastq/edge_fastq/unpairedcleanreads/"$short"_R2.cl.un.fq \
+        ILLUMINACLIP:/data/popgen/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10 \
+        LEADING:20 \
+        TRAILING:20 \
+        SLIDINGWINDOW:6:20 \
+        HEADCROP:12 \
+        MINLEN:35 
+ 
+done 
+
+```
+
+Lastly, we'll start mapping to the reference genome using BWA and use a bash script to process the resulting bam files to:
+* sort
+* mark and remove PCR duplicates
+* sort again, and then index for quick processing later
+
+Here's the mapping code:
+
+```
+#!/bin/bash
+
+# Reference genome for aligning our reads
+
+# Note -- this is a reduced version of the full Picea abies genome (>20 Gb!), containing just scaffolds with probes for our exome seqs
+ref="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
+
+#number of CPU used -- set conservatively
+t=1
+
+# Indexing the genome -- already done.  In the future, you'll need this step if working on a new project/genome
+#bwa index ${ref}
+
+# Aligning individual sequences to the reference
+
+for forward in ${input}*_R1.cl.pd.fq
+do
+	reverse=${forward/_R1.cl.pd.fq/_R2.cl.pd.fq}
+	f=${forward/_R1.cl.pd.fq/}
+	name=`basename ${f}`
+	echo "@ Aligning $name..."
+	bwa mem -t ${t} -M -a ${ref} ${forward} ${reverse} > ${output}/BWA/${name}.sam
+done
+
+### Sorting SAM files and converting to BAM files
+###  Note, a similar program to samtools that is faster for 'view', 'flagstat', and 'markdup' is sambamba.  Use it when possible.
+
+for f in ${output}/BWA/*.sam
+do
+	out=${f/.sam/}
+	sambamba-0.7.1-linux-static view -S --format=bam ${f} -o ${out}.bam
+	samtools sort ${out}.bam -o ${out}.sorted.bam
+	rm ${out}.bam
+done
+
+```
+
+And lastly the post-processing of the bam files:
+
+```
+#!/bin/bash
+
+### Removing PCR duplicates
+for file in ${output}/BWA/${mypop}*.sorted.bam
+do
+	f=${file/.sorted.bam/}
+	sambamba-0.7.1-linux-static markdup -r -t 10 ${file} ${f}.rmdup.bam
+	samtools sort ${f}.rmdup.bam -o ${f}.sorted.rmdup.bam
+done
+
+
+# Stats on bwa alignments
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	f=${file/.sorted.rmdup.bam/}
+	name=`basename ${f}`
+	echo ${name} >> ${myrepo}/myresults/${mypop}.names.txt
+	samtools flagstat ${file} | awk 'NR>=5&&NR<=13 {print $1}' | column -x
+done >> ${myrepo}/myresults/${mypop}.flagstats.txt
+
+
+# Reads mapping quality scores
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools view ${file} | awk '$5>=0{c0++}; $5>0{c1++}; $5>9{c9++}; $5>19{c19++}; $5>29{c29++};  END {print c0 " " c1 " " c9 " " c19 " " c29}'
+done >> ${myrepo}/myresults/${mypop}.Qscores.txt
+
+# Nucleotide coverage
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools depth ${file} | awk '{sum+=$3} END {print sum/NR}'
+done >> ${myrepo}/myresults/${mypop}.coverage.txt
+
+R --vanilla <<EOF
+
+	reads_Q = read.table("${myrepo}/myresults/${mypop}.Qscores.txt",header = FALSE)
+	mean_cov = read.table("${myrepo}/myresults/${mypop}.coverage.txt",header = FALSE)
+	ind_names = read.table("${myrepo}/myresults/${mypop}.names.txt", header = FALSE)
+	qual_res = cbind (ind_names, reads_Q, mean_cov)
+	colnames(qual_res) = c("Individuals", "Total_reads", "Total_mapped", "Total_mapq10", "Total_mapq20", "Total_mapq30", "Mean_cov")
+	write.table(qual_res, "${myrepo}/myresults/${mypop}_MappingResults.txt")
+EOF
+
+for file in ${output}/BWA/${mypop}*.sorted.rmdup.bam
+do
+	samtools index ${file}
+done
+
+```
+
+To make our scripts not too long and cumbersome, and to enable more focused troubleshooting if bugs arise, we separated each of these major functions into the own scripts, and then ran them using a shell-script wrapper:
+
+```
+#!/bin/bash
+
+# Pipeline to process and map RS exome sequences
+
+# Set your repo address here -- double check carefully!
+myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+# Each student gets assigned a population to work with:
+mypop="AB"
+
+#Directory with demultiplexed fastq files
+input="/data/project_data/RS_ExomeSeq/fastq/edge_fastq/pairedcleanreads/${mypop}"
+
+
+# Output dir to store mapping files (bam)
+output="/data/project_data/RS_ExomeSeq/mapping"
+
+
+#  Trim reads and count numbers of cleaned and paired reads
+
+cd ${myrepo}/myscripts
+
+source ./trimmedReadCounts.sh
+
+
+#  Map reads to ref genome using BWA
+
+source ./mapping.sh
+
+
+# Take sequence alignment  (sam) files and convert to bam>sort>remove PCR dups>sort again>index
+# Calculate alignment stats for each individual and create table for my population
+
+source ./process_bam.sh
+
+```
+
+
 ------
 <div id='id-section3'/>
-### Page 3:
+### Page 3: 2020-02-04
+
+Getting some assembly stats on the Picea abies 1.0 reference genome, as well as the size and characteristics of our reduced reference.  
+
+Goals for tomorrow:
+
+1. Review read trim and QC processing from last week -- questions?
+2. Look at characteristics of the P. abies reference genome -- stats and discuss
+3. Set up mapping of exome capture reads to reference
+	- have students work on their assigned pops
+	- try coding one line at a time in outside text editor, with copy/paste to coimmand-line to check
+	- once checks look good, have them assmeble into full bash script
+	- review use of `screen` command to run process in backgroun with no hangup
+4. Look at some of the previously mapped bam files with `samtools tview`
+	- discuss sam/bam format
+	- look at read coverage and MAQ
+5. Discuss need for dealing with genotype uncertainty in downstream analyses
+	- introduce concepts from Nielsen 2011 (Nat. Rev. Genet.)
+	- focus on genotype likelihoods; use tools from ANGSD
+	
+Work to get ready:
+
+* How many contigs in the reduced P. abies reference?  What is their size distribution?  Their N50?
+
+* Found this handy one-liner for calculating contig size in a multi-fasta file:
+
+```
+cat ../../ReferenceGenomes/Pabies1.0-genome_reduced.fa | awk '$0 ~ ">" {print c; c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' >../../Pabies1.0-genome_reduced_contigsizes.txt
+```
+
+* Reduced ref stats:
+	- Total size = 668,091,227 bp (668 Mbp).  Compare to total P. abies genome size of 19600 Mbp (reduced = 3.4% of full)
+	- N contigs = 33,679
+	- N50 = 101,375 bp
+
+* Compare to full P. abies genome ([Nystedt et al. 2013](https://www.nature.com/articles/nature12211))
+
+![](https://media.springernature.com/lw750/springer-static/image/art%3A10.1038%2Fnature12211/MediaObjects/41586_2013_Article_BFnature12211_Figa_HTML.jpg)
+
+
 ------
 <div id='id-section4'/>
 ### Page 4:

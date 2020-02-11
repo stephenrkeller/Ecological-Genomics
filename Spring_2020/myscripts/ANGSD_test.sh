@@ -1,0 +1,35 @@
+ANGSD -b ~/Ecological_Genomics/Spring_2020/mydata/RS_bamlist.txt \
+-ref /data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa \
+-anc /data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa \
+-out ../myresults/RStestGLD \
+-nThreads 20 \
+-uniqueOnly 1 \
+-remove_bads 1 \
+-trim 0 \
+-C 50 \
+-baq 1 \
+-minMapQ 20 \
+-minQ 20 \
+-minInd 55 \
+-setMinDepthInd 2 \
+-setMaxDepthInd 17 \
+-setMinDepth 15 \
+-setMaxDepth 550 \
+-skipTriallelic 1  \
+#-minMaf 0.01 \
+-GL 1 \
+-doHWE 1 \
+-doGeno 32 \
+-doPost 1 \
+-doCounts 1 \
+-doMaf 1 \
+-doMajorMinor 1 \
+-doGlf 1 \
+-dumpCounts 2 \
+-doQsDist 1 \
+-doDepth 1 \
+-doSaf 1 \
+-fold 0 \
+-hetbias_pval 0.001 \
+-dosnpstat 1
+#-SNP_pval 0.001
