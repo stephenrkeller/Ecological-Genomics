@@ -2,10 +2,10 @@
 
 # Pipeline to process and map RS exome sequences
 
-cd ${myrepo}/myscripts
-
 # Set your repo address here -- double check carefully!
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
+
+cd ${myrepo}/myscripts
 
 # Output dir to store mapping files (bam)
 output="/data/project_data/RS_ExomeSeq/mapping"
