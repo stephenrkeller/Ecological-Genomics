@@ -1,0 +1,2 @@
+Num.reads R1 R2 Paired MateMapped Singletons MateMappedDiffChr
+1215686	607235	608451	727524	1096788	39031	361526
