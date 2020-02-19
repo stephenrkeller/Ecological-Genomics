@@ -26,8 +26,8 @@ dev.off()
 summary(theta)
 theta[which(theta$tajD>1.5 & theta$tPsite<0.001),]
 
-PC <- read.table("EDGE_poly.covar")
-PCA <- eigen(PC)$vectors
+covar <- read.table("EDGE_poly.covar")
+PCA <- eigen(covar)$vectors
 
 annot <- read.table("EDGE.annot")
 
