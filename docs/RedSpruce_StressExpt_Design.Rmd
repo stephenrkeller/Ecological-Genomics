@@ -1,0 +1,88 @@
+---
+title: "Red spruce stress-omics experiment"
+date: 'Fall 2019'
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+fontsize: 18pt
+---
+
+### Red spruce stress transcriptomics experiment
+
+Res spruce is a montane coniferous tree that inhabits cool moist habitats in the northeast.  Occasionally it also less ideal sites that are warmer and drier, particularly driven by microsite differences in aspect and substrate (rocky scree slopes exposed to direct sun). The purpose of this experiment was to sample red spruce genetic variation from sites that were polarized into cool & wet vs. hot and dry based on historic climate (based on Bio18 (precip of warmest quarter) and Bio5 (temp of warmest month), and to assess the gene expression responses of individuals from these habitats in response to experimental treatments of heat and heat+drought.
+
+### Experimental Design:
+
+1. Ten maternal families total; sample labels are "POP_FAM"
+  + ASC_06, BRU_05, ESC_01, XBM_07, NOR_02, CAM_02, JAY_02, KAN_04, LOL_02, MMF_13
+
+2. Two Source Climates (SourceClim: 
+  + **HotDry (5 fams):** ASC_06, BRU_05, ESC_01, XBM_07, NOR_02
+  + **CoolWet (5 fams):** CAM_02, JAY_02, KAN_04, LOL_02, MMF_13
+
+3. Experimental Treatments (Trt):
+  + **Control:** watered every day, 16:8 L:D photoperiod at 23C:17C temps
+  + **Heat:** 16:8 L:D photoperiod at 35C:26C temps (50% increase in day and night temps over controls)
+  + **Heat+Drought:** Heat plus complete water witholding 
+
+4. Three time periods (Day):
+  + Harvested tissues on Days 0, 5, and 10
+  + Extracted RNA from whole seedlings (root, stem, needle tissue)
+  + Aimed for 5 biological reps per Trt x SourceClim x Day combo, but day5 had few RNA extractions that worked
+  
+### Realized sample replication after sequencing:  N=76
+
+|Trt        | SourceClim  |Day    |Nreps  |
+|-----------|-------------|-------|-------|
+|Control    |CoolWet      | 0     |5      |
+|Control    |CoolWet      | 5     |3      |
+|Control    |CoolWet      | 10    |5      |
+|Control    |HotDry       | 0     |5      |
+|Control    |HotDry       | 5     |3      |
+|Control    |HotDry       | 10    |5      |
+|Heat       |CoolWet      | 0     |5      |
+|Heat       |CoolWet      | 5     |3      |
+|Heat       |CoolWet      | 10    |5      |
+|Heat       |HotDry       | 0     |5      |
+|Heat       |HotDry       | 5     |2      |
+|Heat       |HotDry       | 10    |5      |
+|HeatDry    |CoolWet      | 0     |5      |
+|HeatDry    |CoolWet      | 5     |1      |
+|HeatDry    |CoolWet      | 10    |5      |
+|HeatDry    |HotDry       | 0     |5      |
+|HeatDry    |HotDry       | 5     |4      |
+|HeatDry    |HotDry       | 10    |5      |
+|-----------|-------------|-------|-------|
+|Total      |             |       |76     |
+
+
+
+### Library prep and sequencing
+
+* Samples were quantified for RNA concentration and quality on the Bioanalyzer
+* Samples >1 ng/ul were sent to [Cornell for 3' tag sequencing](http://www.biotech.cornell.edu/node/563#threeprime)
+* Library prep followed the [LexoGen protocol](https://www.lexogen.com/quantseq-3mrna-sequencing/) and sequencing was on 1 lane of a NextSeq500 (1x86 bp reads)
+* Samples were demultiplexed and named according to the convention: POP_FAM_TRT_DAY
+
+### Bioinformatics:
+
+* Suggested pipeline details given [here:](https://www.lexogen.com/quantseq-data-analysis/)
+* Recommended use of STAR aligner for read mapping
+* Reference transcriptome: `/data/project_data/RS_RNASeq/ReferenceTranscriptome/Pabies1.0-all-cds.fna.gz`
+* 66,632 unigenes, consisting of 26,437 high-confidence gene models, 32,150 medium-confidence gene models, and 8,045 low-confidence gene models
+
+
+### Main questions of interest:
+
+1. Do families from different source climates differ for their gene expression?
+
+2. Is there a transcriptome wide response to heat stress?  Does this change when the additional stress of drought is added?  
+
+3. Is there a significant interaction between source climate and stress treatment, such that families from hot/dry climates have a unique expression response to heat or heat+drought compared to families from cool/wet climates?
+
+4. Which specific genes are involved in the above responses, and do they reveal functional enrichment of particular pathways?
+
+5. Do DE genes or pathways show evidence of positive selection (compare DE genes with popgen signatures of sel'n)?
+
+6. Can we use association mapping to identify eQTL associated with DE responses?
+

@@ -34,7 +34,6 @@ ANGSD -b ${output}/${mypop}_bam.list \
 -doMajorMinor 1 \
 -doMaf 1 \
 -doSaf 1 \
--doHWE 1 \
 # -SNP_pval 1e-6
 
 #Estimation of the SFS for all sites
@@ -43,7 +42,7 @@ realSFS ${output}/${mypop}_allsites.saf.idx -maxIter 1000 -tole 1e-6 -P 1 > ${ou
 # Estimating thetas for all sites, using the SFS from above as a prior to estimate the GL's
 ANGSD -b ${output}/${mypop}_bam.list \
 -ref ${REF} -anc ${REF} \
--out ${output}/${mypop} \
+-out ${output}/${mypop}_allsites \
 -nThreads 1 \
 -remove_bads 1 \
 -C 50 \
@@ -64,7 +63,54 @@ ANGSD -b ${output}/${mypop}_bam.list \
 
 thetaStat do_stat ${output}/${mypop}_allsites.thetas.idx
 
+# Estimating thetas for all sites, using the FOLDED SFS
+ANGSD -b ${output}/${mypop}_bam.list \
+-ref ${REF} -anc ${REF} \
+-out ${output}/${mypop}_outFold \
+-nThreads 1 \
+-remove_bads 1 \
+-C 50 \
+-baq 1 \
+-minMapQ 20 \
+-minQ 20 \
+-setMinDepth 3 \
+-minInd 2 \
+-setMinDepthInd 1 \
+-setMaxDepthInd 17 \
+-skipTriallelic 1 \
+-GL 1 \
+-doCounts 1 \
+-doMajorMinor 1 \
+-doMaf 1 \
+-doSaf 1 \
+-doHWE 1 \
+-fold 1
+# -SNP_pval 1e-6
 
+#Estimation of the SFS for all sites
+realSFS ${output}/${mypop}_outFold.saf.idx -maxIter 1000 -tole 1e-6 -P 1 > ${output}/${mypop}_outFold.sfs
+
+ANGSD -b ${output}/${mypop}_bam.list \
+-ref ${REF} -anc ${REF} \
+-out ${output}/${mypop} \
+-nThreads 1 \
+-remove_bads 1 \
+-C 50 \
+-baq 1 \
+-minMapQ 20 \
+-minQ 20 \
+-minInd 2 \
+-setMinDepthInd 1 \
+-setMaxDepthInd 17 \
+-setMinDepth 3 \
+-skipTriallelic 1 \
+-GL 1 \
+-doCounts 1 \
+-doMajorMinor 1 \
+-pest ${output}/${mypop}_outFold.sfs \
+-doSaf 1 \
+-doThetas 1 \
+-fold 1
 
 ### Estimating Fst estimates between your focal population and all the others ###
 for POP2 in `cat ${myrepo}/mydata/edgepops_no${mypop}.txt`
