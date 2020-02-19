@@ -2,7 +2,7 @@
 
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 
-mkdir ${myrepo}/myresults/ANGSD
+#mkdir ${myrepo}/myresults/ANGSD
 
 output="${myrepo}/myresults/ANGSD"
 
@@ -69,7 +69,7 @@ thetaStat do_stat ${output}/${mypop}_allsites.thetas.idx
 #############################################################
 
 ANGSD -b ${output}/${mypop}_bam.list \
--ref ${REF} -anc ${REF} \
+-ref ${REF} \
 -out ${output}/${mypop}_outFold \
 -nThreads 1 \
 -remove_bads 1 \
@@ -87,7 +87,6 @@ ANGSD -b ${output}/${mypop}_bam.list \
 -doMajorMinor 1 \
 -doMaf 1 \
 -doSaf 1 \
--doHWE 1 \
 -fold 1
 # -SNP_pval 1e-6
 
@@ -95,8 +94,8 @@ ANGSD -b ${output}/${mypop}_bam.list \
 realSFS ${output}/${mypop}_outFold.saf.idx -maxIter 1000 -tole 1e-6 -P 1 > ${output}/${mypop}_outFold.sfs
 
 ANGSD -b ${output}/${mypop}_bam.list \
--ref ${REF} -anc ${REF} \
--out ${output}/${mypop} \
+-ref ${REF} \
+-out ${output}/${mypop}_outFold \
 -nThreads 1 \
 -remove_bads 1 \
 -C 50 \

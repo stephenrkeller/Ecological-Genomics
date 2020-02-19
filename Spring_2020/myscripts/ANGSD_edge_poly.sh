@@ -2,17 +2,17 @@
 
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 
-OUT="/data/project_data/RS_ExomeSeq/ANGSD/PCA"
+OUT="/data/project_data/RS_ExomeSeq/ANGSD"
 
 REF="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
 
 
 # List of bam files for this region
-ls /data/project_data/RS_ExomeSeq/mapping/BWA/*sorted.rm*.bam > ${OUT}/EDGE_bam.list
+#ls /data/project_data/RS_ExomeSeq/mapping/BWA/*sorted.rm*.bam > ${OUT}/EDGE_bam.list
 
 
 ANGSD -b ${myrepo}/myresults/EDGE_bam.list \
--ref ${REF} -anc ${REF} -out ${OUT}/EDGE_poly \
+-ref ${REF} -anc ${REF} -out ${OUT}/PCA/EDGE_poly \
 -nThreads 10 \
 -remove_bads 1 \
 -C 50 \
@@ -39,11 +39,11 @@ ANGSD -b ${myrepo}/myresults/EDGE_bam.list \
 ##################################
 
 
-gunzip ${OUT}/EDGE_poly.geno.gz
+gunzip ${OUT}/PCA/EDGE_poly.geno.gz
 
-NSITES=`cat ${OUT}/EDGE_poly.geno | tail -n+2 | wc -l`
+NSITES=`cat ${OUT}/PCA/EDGE_poly.geno | tail -n+2 | wc -l`
 
-/data/popgen/ngsTools/ngsPopGen/ngsCovar -probfile ${OUT}/EDGE_poly.geno -outfile ${OUT}/EDGE_poly.covar -nind 108 -nsites $NSITES -call 0 -norm 0
+/data/popgen/ngsTools/ngsPopGen/ngsCovar -probfile ${OUT}/PCA/EDGE_poly.geno -outfile ${OUT}/PCA/EDGE_poly.covar -nind 108 -nsites $NSITES -call 0 -norm 0
 
 
 # PCA - Estimating the covariance matrix with pcangsd -- Not working!
@@ -60,13 +60,17 @@ NSITES=`cat ${OUT}/EDGE_poly.geno | tail -n+2 | wc -l`
 ############################################
 
 blups="/data/project_data/RS_ExomeSeq/ANGSD/blups"
+
+OUT="/data/project_data/RS_ExomeSeq/ANGSD"
+
 contigs="/data/project_data/RS_ExomeSeq/ANGSD/contig_splits"
+
 mycontigs="xaa"
-PCA="/data/project_data/RS_ExomeSeq/ANGSD/PCA"
 
 
-ANGSD -b ${myrepo}/myresults/EDGE_bam.list \
+ANGSD -b ${OUT}/EDGE_bam.list \
 -ref ${REF} \
+-out ${OUT}/GWAS/Ht_EDGE_MD_PC12_${mycontigs} \
 -remove_bads 1 \
 -C 50 \
 -baq 1 \
@@ -83,11 +87,11 @@ ANGSD -b ${myrepo}/myresults/EDGE_bam.list \
 -doMajorMinor 1 \
 -doMaf 1 \
 -SNP_pval 1e-6 \
--yQuant ${blups}/Ht_EDGE_VTMDNC.blups \
+-yQuant ${blups}/Ht_EDGE_MD.blups \
 -doAsso 5 \
 -rf ${contigs}/${mycontigs} \
--cov ${PCA}/EDGE_PC1.txt \
--out ${myrepo}/Ht_EDGE_all_pc1_${mycontigs}
+-cov ${OUT}/PCA/EDGE_PC12.txt
+
 
 
 
