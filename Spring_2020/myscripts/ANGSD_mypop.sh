@@ -1,12 +1,12 @@
 myrepo="/users/s/r/srkeller/Ecological_Genomics/Spring_2020"
 
-mkdir ${myrepo}/myresults/ANGSD
+#mkdir ${myrepo}/myresults/ANGSD
 
 output="${myrepo}/myresults/ANGSD"
 
 mypop="AB"
 
-ls /data/project_data/RS_ExomeSeq/mapping/BWA/${mypop}_*sorted.rm*.bam >${output}/${mypop}_bam.list
+#ls /data/project_data/RS_ExomeSeq/mapping/BWA/${mypop}_*sorted.rm*.bam >${output}/${mypop}_bam.list
 
 REF="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa"
 

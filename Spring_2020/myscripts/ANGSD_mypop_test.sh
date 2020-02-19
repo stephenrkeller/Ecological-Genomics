@@ -63,7 +63,11 @@ ANGSD -b ${output}/${mypop}_bam.list \
 
 thetaStat do_stat ${output}/${mypop}_allsites.thetas.idx
 
-# Estimating thetas for all sites, using the FOLDED SFS
+#############################################################
+#### Estimating thetas for all sites, using the FOLDED SFS
+#### Not strictly necessary, but I was curious...
+#############################################################
+
 ANGSD -b ${output}/${mypop}_bam.list \
 -ref ${REF} -anc ${REF} \
 -out ${output}/${mypop}_outFold \
@@ -87,7 +91,7 @@ ANGSD -b ${output}/${mypop}_bam.list \
 -fold 1
 # -SNP_pval 1e-6
 
-#Estimation of the SFS for all sites
+#Estimation of the SFS for all sites using the FOLDED SFS
 realSFS ${output}/${mypop}_outFold.saf.idx -maxIter 1000 -tole 1e-6 -P 1 > ${output}/${mypop}_outFold.sfs
 
 ANGSD -b ${output}/${mypop}_bam.list \
@@ -111,6 +115,12 @@ ANGSD -b ${output}/${mypop}_bam.list \
 -doSaf 1 \
 -doThetas 1 \
 -fold 1
+
+thetaStat do_stat ${output}/${mypop}_outFold.thetas.idx
+thetaStat print ${output}/${mypop}_outFold.thetas.idx
+
+#################################################################################
+
 
 ### Estimating Fst estimates between your focal population and all the others ###
 for POP2 in `cat ${myrepo}/mydata/edgepops_no${mypop}.txt`
