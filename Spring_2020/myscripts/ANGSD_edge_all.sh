@@ -11,7 +11,7 @@ REF="/data/project_data/RS_ExomeSeq/ReferenceGenomes/Pabies1.0-genome_reduced.fa
 ls /data/project_data/RS_ExomeSeq/mapping/BWA/*sorted.rm*.bam > ${OUT}/EDGE_bam.list
 
 
-ANGSD -b ${myrepo}/myresults/EDGE_bam.list \
+ANGSD -b ${OUT}/EDGE_bam.list \
 -ref ${REF} -anc ${REF} \
 -out ${OUT}/EDGE_all_Folded \
 -nThreads 10 \
@@ -37,7 +37,7 @@ realSFS ${OUT}/EDGE_all_Folded.saf.idx -maxIter 1000 -tole 1e-6 -P 1 > ${OUT}/ED
 
 # Estimate thetas and stats using the SFS as a prior
 
-ANGSD -b ${output}/${mypop}_bam.list \
+ANGSD -b ${OUT}/EDGE_bam.list \
 -ref ${REF} -anc ${REF} \
 -out ${OUT}/EDGE_all_Folded \
 -nThreads 10 \
