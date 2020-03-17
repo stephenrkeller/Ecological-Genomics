@@ -119,6 +119,7 @@ where,
 ```
 * error = the error variance
 
+
 ANGSD uses genotype probabilities as input and tests each SNP for association with a Likelihood Ratio Test (LRT) which tests the likelihood of there being an association / likelihood of NO association.  The LRT is ~ chisq distributed with 1 d.f.
 
 The basic set up is:

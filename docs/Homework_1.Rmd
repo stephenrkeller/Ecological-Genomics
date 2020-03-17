@@ -1,0 +1,52 @@
+---
+title: "P/BIO381 Homework #1"
+due date: 'February 24, 2020'
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+fontsize: 18pt
+---
+
+### Assignment: Investigate the genetic architecture of seedling growth in contrasting climate environments
+
+We recently saw how e can use GWAS on phenotypic traits (or cliamte data) to investigate SNP loci that are potentially involved in local adaptation.  In the context of conservation of genetic diversity under climate change, this leads us to two questions:
+
+1. Do the genomic regions associated with height growth show evidence of tradeoffs, such that the effect of a SNP is positive in one climatic environment, but negative in the other?
+* This type of antagonstic pleiotropy might constrain the ability to use assisted migration to move adaptive alleles between populations to mitigate climate change effects
+
+2. Are there genomic regions that show universally high growth under all climates tested?  If so, these are good candidates for using in restoration now...
+
+#### Workflow:
+
+For your homework, I want you to investigate the hypothesis above by comparing the results from GWAS on the two different common gardens located in the vicinity of the EDGE populations -- the MD site and the NC site.  Here's your workflow:
+
+1. Run a GWAS on **all** contigs (not just the ones assigned to you in class) using the NC garden height blups.
+
+2. Import the results into R, and determine p-values for the LRT statistic. Remember, `P_NC <- pchisq(LRTscore,1,lower.tail=F))`
+
+3. Merge the dataframe for the NC site with the equivalent one for the MD site (we did in class together)
+
+* hint:  many ways to do this, but I can suggest the 'merge' function in R:  `new.df <- merge(MD.df, NC.df, by=c("Chromosome","Position"))`
+
+4. Estimate which SNPs (chromosome and position) show strong evidence (P < 1E-4) of a phenotype~genotype association in BOTH garden sites
+
+* hint: something like.... `new.df[which(new.df$P_MD<1E-4 && new.df$P_NC<1E-4),]`
+
+5. Now, look at the betas (effect size and direction) associated with the loci that are significant at each garden site.  Determine how many are:
+
+* both significant and positive in their effect on height
+
+* both significant and opposite in sign (either +/- or -/+ for NC/MD gardens)
+
+6. BONUS (optional):  If you get through 5), you can look at the SFS in your pop for these two sets of loci -- the positively associated set and the antagonistic set -- to see if your pop is a good potential contributor to assisted migration. To do this, get the Chromosome and Position info for the two sets of loci from above out of R, and export them as separate text files.  Then, run ANGSD to get the SFS (as we did before) for your population, but use the `-rf` flag to have it use **JUST** the positions you list in your file.  You can then look at the SFS to see how many are polymorphic, and of those, how many are at high frequency in your sample.
+
+
+Your write-up should be 2 pgs (max) and include a max of 3 tables and/or figures (total of 3).  Your writeup should have the following elements:
+
+* A basic description of the question being asked
+* Brief background on the study system and the library prep.
+* A short (1 paragraph max) description of the pipeline used to process the exome capture data (from fastqc to GWAS)
+* Presentation of your results
+* Biological conclusions and discussion of caveats, future research directions, etc.
+
+
